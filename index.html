@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Saúde Unificada · Gestão Ocupacional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar" aria-label="Navegação principal">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            <path d="M12 9v4"/>
+            <path d="M10 11h4"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <div class="brand-name">Saúde Unificada</div>
+          <div class="brand-sub">Gestão Ocupacional</div>
+        </div>
+        <button id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Fechar menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-label">Menu Principal</div>
+        <a href="#" class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="2" />
+              <rect x="14" y="3" width="7" height="7" rx="2" />
+              <rect x="14" y="14" width="7" height="7" rx="2" />
+              <rect x="3" y="14" width="7" height="7" rx="2" />
+            </svg>
+          </span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-view="trabalhadores">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </span>
+          <span class="nav-text">Trabalhadores</span>
+        </a>
+        <a href="#" class="nav-item" data-view="exames">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+          </span>
+          <span class="nav-text">Exames & ASOs</span>
+        </a>
+        <a href="#" class="nav-item" data-view="relatorios">
+          <span class="nav-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+              <path d="M22 12A10 10 0 0 0 12 2v10z" />
+            </svg>
+          </span>
+          <span class="nav-text">Relatórios</span>
+          <span id="nav-pend" class="count hidden">0</span>
+        </a>
+      </nav>
+
+      <!-- Side CTA Card (Inspired by reference mockup illustration card) -->
+      <div class="side-card">
+        <div class="side-card-illus">
+          <svg width="140" height="96" viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="25" y="20" width="110" height="75" rx="14" fill="#EFF6FF" />
+            <circle cx="80" cy="45" r="22" fill="#DBEAFE" />
+            <!-- Stethoscope / Medical Heart Symbol -->
+            <path d="M80 34c4.5-5 12-2 12 4.5 0 6.5-12 13-12 13s-12-6.5-12-13c0-6.5 7.5-9.5 12-4.5z" fill="#2563EB" opacity="0.9" />
+            <!-- Floating cards & check badges -->
+            <rect x="42" y="68" width="76" height="6" rx="3" fill="#93C5FD" />
+            <rect x="52" y="78" width="56" height="5" rx="2.5" fill="#BFDBFE" />
+            <circle cx="34" cy="30" r="9" fill="#10B981" />
+            <path d="M30.5 30l2.5 2.5 4.5-4.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="126" cy="74" r="8" fill="#F59E0B" />
+            <path d="M126 71v3.5M126 77h.01" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="side-card-content">
+          <strong class="side-card-title">Novo ASO ou Exame?</strong>
+          <p class="side-card-desc">Mantenha registros atualizados e prazos sob controle em segundos.</p>
+        </div>
+        <button class="btn btn-primary btn-block side-card-btn" data-open="modal-exame">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Registrar Exame</span>
+        </button>
+      </div>
+    </aside>
+
+    <div id="overlay" class="overlay"></div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <button id="menu-btn" class="icon-btn mobile-menu-btn" aria-label="Abrir menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+
+        <label class="search">
+          <span class="sr-only">Pesquisar</span>
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input id="q" type="search" placeholder="Buscar por trabalhador, exame, setor ou médico..." autocomplete="off">
+          <kbd>/</kbd>
+        </label>
+
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" data-open="modal-trabalhador">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="16" y1="11" x2="22" y2="11" />
+            </svg>
+            <span class="lbl">+ Trabalhador</span>
+          </button>
+          <button class="btn btn-primary" data-open="modal-exame">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span class="lbl">+ Novo Exame</span>
+          </button>
+
+          <!-- User header profile badge matching reference top-right -->
+          <div class="user-profile-widget" title="Sessão ativa · Gestão Ocupacional">
+            <div class="profile-avatar">
+              <span>GO</span>
+              <span class="profile-status-dot"></span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- FILTROS COMPARTILHADOS (DASHBOARD + EXAMES) -->
+      <div id="filters" class="filters" role="group" aria-label="Filtros de exames">
+        <div class="filters-prefix">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+          </svg>
+          <span class="label">Filtrar por:</span>
+        </div>
+        <select id="f-tipo" class="select" aria-label="Tipo de exame">
+          <option value="todos">Todos os tipos de exame</option>
+          <option>ASO</option>
+          <option>Admissional</option>
+          <option>Periódico</option>
+          <option>Audiometria</option>
+          <option>Ultrassom</option>
+          <option>Demissional</option>
+        </select>
+        <select id="f-status" class="select" aria-label="Status de validade">
+          <option value="todos">Todos os status</option>
+          <option value="validos">Válidos (Em dia)</option>
+          <option value="alerta">A vencer (30 dias)</option>
+          <option value="vencidos">Vencidos (Atenção)</option>
+        </select>
+        <select id="f-ordem" class="select" aria-label="Ordenação por data">
+          <option value="recentes">Mais recentes primeiro</option>
+          <option value="antigos">Mais antigos primeiro</option>
+          <option value="vencimento">Vencimento mais próximo</option>
+        </select>
+        <button id="f-clear" class="link-btn hidden">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          <span>Limpar filtros</span>
+        </button>
+      </div>
+
+      <!-- ================= VIEW: DASHBOARD ================= -->
+      <section id="view-dashboard" class="view">
+        <div class="dash">
+          <!-- Main Central Column -->
+          <div class="dash-main">
+            <!-- Top Hero Card with Total and Dual-Tone Bar Chart (Reference Hero) -->
+            <div class="card card-pad hero-card">
+              <div class="hero-header">
+                <div>
+                  <div class="eyebrow">Total de Exames Registrados</div>
+                  <div class="hero-num-wrapper">
+                    <span id="k-total" class="hero-num">0</span>
+                    <span class="trend-badge positive">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <line x1="12" y1="19" x2="12" y2="5"/>
+                        <polyline points="5 12 12 5 19 12"/>
+                      </svg>
+                      100% monitorados
+                    </span>
+                  </div>
+                </div>
+                <div class="hero-period-pill">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  <span>Últimos 12 meses</span>
+                </div>
+              </div>
+
+              <!-- Bar Chart Container -->
+              <div class="chart-wrapper">
+                <div id="chart" class="chart" aria-hidden="true"></div>
+              </div>
+            </div>
+
+            <!-- KPIs Row: Friendly Circular Pastel Avatars (Reference 'Growing at Superhuman Rate') -->
+            <div class="kpis-section">
+              <div class="section-subtitle">INDICADORES DE SAÚDE OCUPACIONAL</div>
+              <div class="kpis">
+                <button class="kpi" data-kpi="todos">
+                  <div class="kpi-top">
+                    <div class="kpi-icon ic-blue">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                      </svg>
+                    </div>
+                    <span class="kpi-micro-badge">Total</span>
+                  </div>
+                  <div class="kpi-body">
+                    <span class="kpi-label">Trabalhadores</span>
+                    <div id="k-trab" class="kpi-num">0</div>
+                  </div>
+                </button>
+
+                <button class="kpi" data-kpi="validos">
+                  <div class="kpi-top">
+                    <div class="kpi-icon ic-ok">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                    <span class="kpi-micro-badge ok">Em dia</span>
+                  </div>
+                  <div class="kpi-body">
+                    <span class="kpi-label">Exames Válidos</span>
+                    <div id="k-ok" class="kpi-num">0</div>
+                  </div>
+                </button>
+
+                <button class="kpi" data-kpi="alerta">
+                  <div class="kpi-top">
+                    <div class="kpi-icon ic-warn">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="12" cy="12" r="9" />
+                        <polyline points="12 7 12 12 15 14" />
+                      </svg>
+                    </div>
+                    <span class="kpi-micro-badge warn">A vencer</span>
+                  </div>
+                  <div class="kpi-body">
+                    <span class="kpi-label">Próximos 30 dias</span>
+                    <div id="k-warn" class="kpi-num">0</div>
+                  </div>
+                </button>
+
+                <button class="kpi" data-kpi="vencidos">
+                  <div class="kpi-top">
+                    <div class="kpi-icon ic-err">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </div>
+                    <span class="kpi-micro-badge err">Renovar</span>
+                  </div>
+                  <div class="kpi-body">
+                    <span class="kpi-label">Vencidos</span>
+                    <div id="k-err" class="kpi-num">0</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Historical Occupational Split Panel (Reference 'Top Funnels' / Content List) -->
+            <div class="card split-card">
+              <div class="card-head">
+                <div class="card-head-title">
+                  <h2 class="h2">Histórico Ocupacional</h2>
+                  <span id="count-trab" class="badge neutral">0</span>
+                </div>
+                <span class="subtle">Selecione um trabalhador para visualizar a linha do tempo</span>
+              </div>
+              <div class="split">
+                <!-- Workers Column -->
+                <div class="workers-col">
+                  <div class="col-head">
+                    <span class="eyebrow">Colaboradores</span>
+                  </div>
+                  <div id="worker-list" class="worker-list" role="listbox" aria-label="Trabalhadores"></div>
+                </div>
+                <!-- Examination Timeline Column -->
+                <div class="history-col">
+                  <div id="worker-banner"></div>
+                  <div id="timeline" class="timeline"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Sidebar / Activity & Insights Panel (Reference Right Column) -->
+          <aside class="dash-aside" aria-label="Resumo e Insights">
+            <!-- Top Vibrant Compliance Card (Like 'Active Visitors right now' in reference) -->
+            <div class="conf-card">
+              <div class="conf-card-header">
+                <span class="conf-card-tag">AUDITORIA EM TEMPO REAL</span>
+                <span id="conf-frac" class="conf-card-counter">0/0</span>
+              </div>
+              <div class="conf-card-main">
+                <div class="conf-title">Conformidade Geral</div>
+                <div id="conf-num" class="conf-num">0%</div>
+                <p class="conf-sub">Trabalhadores plenamente regulares perante as NRs.</p>
+              </div>
+              <div class="progress" aria-label="Progresso de conformidade">
+                <i id="conf-bar" style="width:0"></i>
+              </div>
+              <div class="conf-sparkline" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+
+            <!-- Upcoming Expirations Card (Like 'In the last 30 days' notification card) -->
+            <div class="card card-pad upcoming-card">
+              <div class="card-section-header">
+                <div class="eyebrow">Próximos Vencimentos</div>
+                <span class="subtle-badge">Atenção</span>
+              </div>
+              <div id="upcoming" class="upcoming"></div>
+            </div>
+
+            <!-- Exam Type Distribution Card (Like 'Revenue by Channel' in reference) -->
+            <div class="card card-pad dist-card">
+              <div class="card-section-header">
+                <div class="eyebrow">Distribuição por Tipo</div>
+                <span class="subtle-badge">Geral</span>
+              </div>
+              <div id="dist" class="dist"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ================= VIEW: TRABALHADORES ================= -->
+      <section id="view-trabalhadores" class="view hidden">
+        <div class="view-head">
+          <div>
+            <h1 class="h1">Trabalhadores</h1>
+            <p>Consulte, edite e gerencie o quadro de colaboradores cadastrados.</p>
+          </div>
+          <button class="btn btn-primary" data-open="modal-trabalhador">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Novo Trabalhador</span>
+          </button>
+        </div>
+        <div id="grid-trab" class="grid-cards"></div>
+      </section>
+
+      <!-- ================= VIEW: EXAMES & ASOS ================= -->
+      <section id="view-exames" class="view hidden">
+        <div class="view-head">
+          <div>
+            <h1 class="h1">Exames & ASOs</h1>
+            <p>Lista consolidada de todos os registros clínicos, periódicos e ocupacionais.</p>
+          </div>
+          <button class="btn btn-primary" data-open="modal-exame">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Registrar Exame</span>
+          </button>
+        </div>
+        <div class="card table-card">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Trabalhador</th>
+                  <th>Tipo</th>
+                  <th>Realização</th>
+                  <th>Vencimento</th>
+                  <th>Local / Laboratório</th>
+                  <th>Médico Responsável</th>
+                  <th>Situação</th>
+                  <th style="text-align:right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tb-exames"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW: RELATÓRIOS ================= -->
+      <section id="view-relatorios" class="view hidden">
+        <div class="view-head">
+          <div>
+            <h1 class="h1">Relatórios de Conformidade</h1>
+            <p>Visibilidade clara de prazos para auditorias, fiscalizações e gestão preventiva de saúde.</p>
+            <p id="print-date" class="print-only subtle"></p>
+          </div>
+          <div class="view-head-actions">
+            <button id="btn-print" class="btn btn-ghost">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect x="6" y="14" width="12" height="8" />
+              </svg>
+              <span>Imprimir / PDF</span>
+            </button>
+            <button id="btn-csv" class="btn btn-ghost">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>Exportar CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="report-kpis">
+          <div class="card report-kpi-card">
+            <div class="eyebrow">Índice de Conformidade</div>
+            <div id="r-conf" class="big c-brand">0%</div>
+            <p class="subtle">Trabalhadores com todos os exames em dia.</p>
+          </div>
+          <div class="card report-kpi-card">
+            <div class="eyebrow">Exames Vencidos</div>
+            <div id="r-err" class="big c-err">0</div>
+            <p class="subtle">Exigem renovação clínica imediata.</p>
+          </div>
+          <div class="card report-kpi-card">
+            <div class="eyebrow">Vencem em 30 Dias</div>
+            <div id="r-warn" class="big c-warn">0</div>
+            <p class="subtle">Agendamento preventivo recomendado.</p>
+          </div>
+        </div>
+
+        <div class="card table-card" style="margin-top:20px;">
+          <div class="card-head">
+            <h2 class="h2">Pendências e Ações Recomendadas por Trabalhador</h2>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Trabalhador</th>
+                  <th>Cargo / Setor</th>
+                  <th>Empresa</th>
+                  <th>Situação</th>
+                  <th>Ação Recomendada</th>
+                </tr>
+              </thead>
+              <tbody id="tb-pend"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- NAVEGAÇÃO INFERIOR MOBILE (SMARTPHONES 320px - 768px) -->
+  <nav class="mobile-bottom-nav" aria-label="Navegação rápida">
+    <a href="#" class="bottom-nav-item active" data-view="dashboard">
+      <span class="bottom-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="2" />
+          <rect x="14" y="3" width="7" height="7" rx="2" />
+          <rect x="14" y="14" width="7" height="7" rx="2" />
+          <rect x="3" y="14" width="7" height="7" rx="2" />
+        </svg>
+      </span>
+      <span class="bottom-nav-label">Dashboard</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-view="trabalhadores">
+      <span class="bottom-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      </span>
+      <span class="bottom-nav-label">Equipe</span>
+    </a>
+    <button class="bottom-nav-cta" data-open="modal-exame" aria-label="Novo Exame" title="Registrar Exame">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    </button>
+    <a href="#" class="bottom-nav-item" data-view="exames">
+      <span class="bottom-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+      </span>
+      <span class="bottom-nav-label">Exames</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-view="relatorios">
+      <span class="bottom-nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+          <path d="M22 12A10 10 0 0 0 12 2v10z" />
+        </svg>
+        <span id="bottom-nav-pend" class="count hidden">0</span>
+      </span>
+      <span class="bottom-nav-label">Relatórios</span>
+    </a>
+  </nav>
+
+  <!-- ================= MODAL TRABALHADOR ================= -->
+  <div id="modal-trabalhador" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="mt-title">
+    <form id="form-trab" class="modal-card" novalidate>
+      <div class="modal-head">
+        <h3 id="mt-title" class="modal-title">Novo Trabalhador</h3>
+        <button type="button" class="close" data-close aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="t-nome">Nome completo <span class="req">*</span></label>
+          <input id="t-nome" class="input" required placeholder="Ex.: João Silva Albuquerque">
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="t-cpf">CPF / Identificador <span class="req">*</span></label>
+            <input id="t-cpf" class="input" required placeholder="000.000.000-00" inputmode="numeric">
+            <span id="t-cpf-err" class="error hidden"></span>
+          </div>
+          <div class="field">
+            <label for="t-setor">Cargo / Setor <span class="req">*</span></label>
+            <input id="t-setor" class="input" required placeholder="Ex.: Operador de Produção">
+          </div>
+        </div>
+        <div class="field">
+          <label for="t-emp">Empresa / Unidade <span class="req">*</span></label>
+          <input id="t-emp" class="input" required placeholder="Ex.: Masterboi Indústria S.A.">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+        <button id="mt-submit" type="submit" class="btn btn-primary">Salvar Trabalhador</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= MODAL EXAME ================= -->
+  <div id="modal-exame" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="me-title">
+    <form id="form-exame" class="modal-card" novalidate>
+      <div class="modal-head">
+        <h3 id="me-title" class="modal-title">Registrar Exame ou ASO</h3>
+        <button type="button" class="close" data-close aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="e-trab">Trabalhador <span class="req">*</span></label>
+          <select id="e-trab" class="input select" required></select>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="e-tipo">Tipo de exame <span class="req">*</span></label>
+            <select id="e-tipo" class="input select" required>
+              <option value="ASO">ASO (Atestado de Saúde Ocupacional)</option>
+              <option value="Admissional">Admissional</option>
+              <option value="Periódico">Periódico</option>
+              <option value="Audiometria">Audiometria tonal</option>
+              <option value="Ultrassom">Ultrassom ocupacional</option>
+              <option value="Demissional">Demissional</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="e-lab">Local / Laboratório <span class="req">*</span></label>
+            <input id="e-lab" class="input" required placeholder="Ex.: Laboratório Central do Recife">
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="e-real">Data de realização <span class="req">*</span></label>
+            <input id="e-real" type="date" class="input" required>
+          </div>
+          <div class="field">
+            <label for="e-venc">Data de vencimento <span class="req">*</span></label>
+            <input id="e-venc" type="date" class="input" required>
+            <span id="e-venc-err" class="error hidden">O vencimento deve ser posterior à realização.</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="e-med">Médico responsável <span class="req">*</span></label>
+          <input id="e-med" class="input" required placeholder="Ex.: Dra. Maria Fernandes (CRM/PE 12345)">
+        </div>
+        <div class="field">
+          <label>Documento digital <span class="req">*</span></label>
+          <div class="seg" role="tablist">
+            <button type="button" class="on" data-doc="link">Colar link</button>
+            <button type="button" data-doc="file">Selecionar arquivo</button>
+          </div>
+          <div id="doc-link">
+            <input id="e-link" type="url" class="input" placeholder="https://drive.google.com/file/d/...">
+          </div>
+          <div id="doc-file" class="hidden">
+            <label id="drop" class="drop" for="e-file">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto 6px;color:#3b82f6;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <strong>Clique para escolher</strong> ou arraste um PDF/imagem
+              <span class="hint">Máx. 10 MB · salvo localmente com segurança</span>
+            </label>
+            <input id="e-file" type="file" accept="application/pdf,image/*" class="sr-only">
+            <span id="file-name" class="hint file-name-tag"></span>
+          </div>
+          <span id="doc-err" class="error hidden">Informe um link válido ou selecione um arquivo.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+        <button id="me-submit" type="submit" class="btn btn-primary">Registrar Exame</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= MODAL CONFIRMAÇÃO ================= -->
+  <div id="modal-confirm" class="modal hidden" role="alertdialog" aria-modal="true" aria-labelledby="mc-title">
+    <form id="form-confirm" class="modal-card" style="max-width:440px" novalidate>
+      <div class="modal-head">
+        <h3 id="mc-title" class="modal-title">Confirmar Exclusão</h3>
+        <button type="button" class="close" data-close aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-body-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <p id="mc-msg" class="muted" style="text-align:center;font-size:14px;line-height:1.5;"></p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+        <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= MODAL VISUALIZADOR ================= -->
+  <div id="modal-doc" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="md-title">
+    <form class="modal-card wide" novalidate onsubmit="return false">
+      <div class="modal-head">
+        <h3 id="md-title" class="modal-title">Documento Digital</h3>
+        <button type="button" class="close" data-close aria-label="Fechar">&times;</button>
+      </div>
+      <div id="md-body" class="modal-body"></div>
+      <div class="modal-foot">
+        <a id="md-open" class="btn btn-ghost" target="_blank" rel="noopener">Abrir em Nova Aba</a>
+        <button type="button" class="btn btn-primary" data-close>Fechar</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
