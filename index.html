@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2f68ee">
   <title>Porto Seguro · Gestão Ocupacional</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +29,7 @@
           <span class="brand-name">Porto</span>
           <span class="brand-sub">Seguro</span>
         </div>
-        <button id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Fechar menu">
+        <button id="sidebar-close-btn" type="button" class="sidebar-close-btn" aria-label="Fechar menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -38,8 +39,8 @@
 
       <nav class="nav">
         <div class="nav-label">Menu Principal</div>
-        <a href="#" class="nav-item active" data-view="dashboard">
-          <span class="nav-icon">
+        <a href="#dashboard" class="nav-item active" data-view="dashboard" aria-current="page">
+          <span class="nav-icon" aria-hidden="true">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="7" height="7" rx="2" />
               <rect x="14" y="3" width="7" height="7" rx="2" />
@@ -49,8 +50,8 @@
           </span>
           <span class="nav-text">Dashboard</span>
         </a>
-        <a href="#" class="nav-item" data-view="trabalhadores">
-          <span class="nav-icon">
+        <a href="#trabalhadores" class="nav-item" data-view="trabalhadores">
+          <span class="nav-icon" aria-hidden="true">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
@@ -60,8 +61,8 @@
           </span>
           <span class="nav-text">Trabalhadores</span>
         </a>
-        <a href="#" class="nav-item" data-view="exames">
-          <span class="nav-icon">
+        <a href="#exames" class="nav-item" data-view="exames">
+          <span class="nav-icon" aria-hidden="true">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
@@ -72,27 +73,25 @@
           </span>
           <span class="nav-text">Exames & ASOs</span>
         </a>
-        <a href="#" class="nav-item" data-view="relatorios">
-          <span class="nav-icon">
+        <a href="#relatorios" class="nav-item" data-view="relatorios">
+          <span class="nav-icon" aria-hidden="true">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
               <path d="M22 12A10 10 0 0 0 12 2v10z" />
             </svg>
           </span>
           <span class="nav-text">Relatórios</span>
-          <span id="nav-pend" class="count hidden">0</span>
+          <span id="nav-pend" class="count hidden" aria-label="Pendências críticas">0</span>
         </a>
       </nav>
 
-      <!-- Side CTA Card (Inspired by reference mockup illustration card) -->
+      <!-- Side CTA Card -->
       <div class="side-card">
-        <div class="side-card-illus">
-          <svg width="140" height="96" viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div class="side-card-illus" aria-hidden="true">
+          <svg width="140" height="92" viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="25" y="20" width="110" height="75" rx="14" fill="#EFF6FF" />
             <circle cx="80" cy="45" r="22" fill="#DBEAFE" />
-            <!-- Stethoscope / Medical Heart Symbol -->
             <path d="M80 34c4.5-5 12-2 12 4.5 0 6.5-12 13-12 13s-12-6.5-12-13c0-6.5 7.5-9.5 12-4.5z" fill="#2563EB" opacity="0.9" />
-            <!-- Floating cards & check badges -->
             <rect x="42" y="68" width="76" height="6" rx="3" fill="#93C5FD" />
             <rect x="52" y="78" width="56" height="5" rx="2.5" fill="#BFDBFE" />
             <circle cx="34" cy="30" r="9" fill="#10B981" />
@@ -105,8 +104,8 @@
           <strong class="side-card-title">Novo ASO ou Exame?</strong>
           <p class="side-card-desc">Mantenha registros atualizados e prazos sob controle em segundos.</p>
         </div>
-        <button class="btn btn-primary btn-block side-card-btn" data-open="modal-exame">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <button type="button" class="btn btn-primary btn-block side-card-btn" data-open="modal-exame">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
@@ -115,13 +114,13 @@
       </div>
     </aside>
 
-    <div id="overlay" class="overlay"></div>
+    <div id="overlay" class="overlay" aria-hidden="true"></div>
 
     <!-- MAIN CONTENT AREA -->
     <main class="main">
       <!-- TOPBAR -->
       <header class="topbar">
-        <button id="menu-btn" class="icon-btn mobile-menu-btn" aria-label="Abrir menu">
+        <button id="menu-btn" type="button" class="icon-btn mobile-menu-btn" aria-label="Abrir menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -129,19 +128,24 @@
           </svg>
         </button>
 
+        <div class="mobile-brand-pill" aria-hidden="true">
+          <span class="mobile-brand-dot"></span>
+          <span>Porto Seguro</span>
+        </div>
+
         <label class="search">
           <span class="sr-only">Pesquisar</span>
-          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input id="q" type="search" placeholder="Buscar por trabalhador, exame, setor ou médico..." autocomplete="off">
-          <kbd>/</kbd>
+          <input id="q" type="search" placeholder="Buscar trabalhador, exame, setor ou médico..." autocomplete="off">
+          <kbd aria-hidden="true">/</kbd>
         </label>
 
         <div class="topbar-actions">
-          <button class="btn btn-ghost" data-open="modal-trabalhador">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <button type="button" class="btn btn-ghost" data-open="modal-trabalhador" title="Cadastrar Trabalhador">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <line x1="19" y1="8" x2="19" y2="14" />
@@ -149,15 +153,14 @@
             </svg>
             <span class="lbl">Trabalhador</span>
           </button>
-          <button class="btn btn-primary" data-open="modal-exame">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <button type="button" class="btn btn-primary" data-open="modal-exame" title="Registrar Exame">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
             <span class="lbl">Novo Exame</span>
           </button>
 
-          <!-- User header profile badge matching reference top-right -->
           <div class="user-profile-widget" title="Sessão ativa · Gestão Ocupacional">
             <div class="profile-avatar">
               <span>GO</span>
@@ -170,19 +173,22 @@
       <!-- FILTROS COMPARTILHADOS (DASHBOARD + EXAMES) -->
       <div id="filters" class="filters" role="group" aria-label="Filtros de exames">
         <div class="filters-prefix">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-          </svg>
-          <span class="label">Filtrar por:</span>
+          <span class="filters-prefix-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            <span>Filtrar por:</span>
+          </span>
+          <span id="filter-summary" class="subtle"></span>
         </div>
         <select id="f-tipo" class="select" aria-label="Tipo de exame">
           <option value="todos">Todos os tipos de exame</option>
-          <option>ASO</option>
-          <option>Admissional</option>
-          <option>Periódico</option>
-          <option>Audiometria</option>
-          <option>Ultrassom</option>
-          <option>Demissional</option>
+          <option value="ASO">ASO</option>
+          <option value="Admissional">Admissional</option>
+          <option value="Periódico">Periódico</option>
+          <option value="Audiometria">Audiometria</option>
+          <option value="Ultrassom">Ultrassom</option>
+          <option value="Demissional">Demissional</option>
         </select>
         <select id="f-status" class="select" aria-label="Status de validade">
           <option value="todos">Todos os status</option>
@@ -195,8 +201,8 @@
           <option value="antigos">Mais antigos primeiro</option>
           <option value="vencimento">Vencimento mais próximo</option>
         </select>
-        <button id="f-clear" class="link-btn hidden">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <button id="f-clear" type="button" class="link-btn hidden">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
@@ -209,7 +215,7 @@
         <div class="dash">
           <!-- Main Central Column -->
           <div class="dash-main">
-            <!-- Top Hero Card with Total and Dual-Tone Bar Chart (Reference Hero) -->
+            <!-- Top Hero Card -->
             <div class="card card-pad hero-card">
               <div class="hero-header">
                 <div>
@@ -217,7 +223,7 @@
                   <div class="hero-num-wrapper">
                     <span id="k-total" class="hero-num">0</span>
                     <span class="trend-badge positive">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
                         <line x1="12" y1="19" x2="12" y2="5" />
                         <polyline points="5 12 12 5 19 12" />
                       </svg>
@@ -226,7 +232,7 @@
                   </div>
                 </div>
                 <div class="hero-period-pill">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
                     <line x1="8" y1="2" x2="8" y2="6" />
@@ -238,15 +244,15 @@
 
               <!-- Bar Chart Container -->
               <div class="chart-wrapper">
-                <div id="chart" class="chart" aria-hidden="true"></div>
+                <div id="chart" class="chart" role="img" aria-label="Gráfico de exames realizados nos últimos 12 meses"></div>
               </div>
             </div>
 
-            <!-- KPIs Row: Friendly Circular Pastel Avatars (Reference 'Growing at Superhuman Rate') -->
+            <!-- KPIs Row -->
             <div class="kpis-section">
               <div class="section-subtitle">INDICADORES DE SAÚDE OCUPACIONAL</div>
               <div class="kpis">
-                <button class="kpi" data-kpi="todos">
+                <button type="button" class="kpi" data-kpi="todos">
                   <div class="kpi-top">
                     <div class="kpi-icon ic-blue">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -262,7 +268,7 @@
                   </div>
                 </button>
 
-                <button class="kpi" data-kpi="validos">
+                <button type="button" class="kpi" data-kpi="validos">
                   <div class="kpi-top">
                     <div class="kpi-icon ic-ok">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
@@ -277,7 +283,7 @@
                   </div>
                 </button>
 
-                <button class="kpi" data-kpi="alerta">
+                <button type="button" class="kpi" data-kpi="alerta">
                   <div class="kpi-top">
                     <div class="kpi-icon ic-warn">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -293,7 +299,7 @@
                   </div>
                 </button>
 
-                <button class="kpi" data-kpi="vencidos">
+                <button type="button" class="kpi" data-kpi="vencidos">
                   <div class="kpi-top">
                     <div class="kpi-icon ic-err">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
@@ -311,7 +317,7 @@
               </div>
             </div>
 
-            <!-- Historical Occupational Split Panel (Reference 'Top Funnels' / Content List) -->
+            <!-- Historical Occupational Split Panel -->
             <div class="card split-card">
               <div class="card-head">
                 <div class="card-head-title">
@@ -325,6 +331,7 @@
                 <div class="workers-col">
                   <div class="col-head">
                     <span class="eyebrow">Colaboradores</span>
+                    <span class="mobile-swipe-hint">Deslize →</span>
                   </div>
                   <div id="worker-list" class="worker-list" role="listbox" aria-label="Trabalhadores"></div>
                 </div>
@@ -337,9 +344,8 @@
             </div>
           </div>
 
-          <!-- Right Sidebar / Activity & Insights Panel (Reference Right Column) -->
+          <!-- Right Sidebar / Activity & Insights Panel -->
           <aside class="dash-aside" aria-label="Resumo e Insights">
-            <!-- Top Vibrant Compliance Card (Like 'Active Visitors right now' in reference) -->
             <div class="conf-card">
               <div class="conf-card-header">
                 <span class="conf-card-tag">AUDITORIA EM TEMPO REAL</span>
@@ -350,7 +356,7 @@
                 <div id="conf-num" class="conf-num">0%</div>
                 <p class="conf-sub">Trabalhadores plenamente regulares perante as NRs.</p>
               </div>
-              <div class="progress" aria-label="Progresso de conformidade">
+              <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progresso de conformidade">
                 <i id="conf-bar" style="width:0"></i>
               </div>
               <div class="conf-sparkline" aria-hidden="true">
@@ -358,7 +364,6 @@
               </div>
             </div>
 
-            <!-- Upcoming Expirations Card (Like 'In the last 30 days' notification card) -->
             <div class="card card-pad upcoming-card">
               <div class="card-section-header">
                 <div class="eyebrow">Próximos Vencimentos</div>
@@ -367,7 +372,6 @@
               <div id="upcoming" class="upcoming"></div>
             </div>
 
-            <!-- Exam Type Distribution Card (Like 'Revenue by Channel' in reference) -->
             <div class="card card-pad dist-card">
               <div class="card-section-header">
                 <div class="eyebrow">Distribuição por Tipo</div>
@@ -386,8 +390,8 @@
             <h1 class="h1">Trabalhadores</h1>
             <p>Consulte, edite e gerencie o quadro de colaboradores cadastrados.</p>
           </div>
-          <button class="btn btn-primary" data-open="modal-trabalhador">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <button type="button" class="btn btn-primary" data-open="modal-trabalhador">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
@@ -404,8 +408,8 @@
             <h1 class="h1">Exames & ASOs</h1>
             <p>Lista consolidada de todos os registros clínicos, periódicos e ocupacionais.</p>
           </div>
-          <button class="btn btn-primary" data-open="modal-exame">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <button type="button" class="btn btn-primary" data-open="modal-exame">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
@@ -442,16 +446,16 @@
             <p id="print-date" class="print-only subtle"></p>
           </div>
           <div class="view-head-actions">
-            <button id="btn-print" class="btn btn-ghost">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button id="btn-print" type="button" class="btn btn-ghost">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <polyline points="6 9 6 2 18 2 18 9" />
                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
                 <rect x="6" y="14" width="12" height="8" />
               </svg>
               <span>Imprimir / PDF</span>
             </button>
-            <button id="btn-csv" class="btn btn-ghost">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button id="btn-csv" type="button" class="btn btn-ghost">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
@@ -504,8 +508,8 @@
 
   <!-- NAVEGAÇÃO INFERIOR MOBILE (SMARTPHONES 320px - 768px) -->
   <nav class="mobile-bottom-nav" aria-label="Navegação rápida">
-    <a href="#" class="bottom-nav-item active" data-view="dashboard">
-      <span class="bottom-nav-icon">
+    <a href="#dashboard" class="bottom-nav-item active" data-view="dashboard" aria-current="page">
+      <span class="bottom-nav-icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="7" height="7" rx="2" />
           <rect x="14" y="3" width="7" height="7" rx="2" />
@@ -515,8 +519,8 @@
       </span>
       <span class="bottom-nav-label">Dashboard</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="trabalhadores">
-      <span class="bottom-nav-icon">
+    <a href="#trabalhadores" class="bottom-nav-item" data-view="trabalhadores">
+      <span class="bottom-nav-icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
           <circle cx="9" cy="7" r="4" />
@@ -526,14 +530,14 @@
       </span>
       <span class="bottom-nav-label">Equipe</span>
     </a>
-    <button class="bottom-nav-cta" data-open="modal-exame" aria-label="Novo Exame" title="Registrar Exame">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <button type="button" class="bottom-nav-cta" data-open="modal-exame" aria-label="Registrar Novo Exame" title="Registrar Exame">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
         <line x1="12" y1="5" x2="12" y2="19" />
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
     </button>
-    <a href="#" class="bottom-nav-item" data-view="exames">
-      <span class="bottom-nav-icon">
+    <a href="#exames" class="bottom-nav-item" data-view="exames">
+      <span class="bottom-nav-icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
           <polyline points="14 2 14 8 20 8" />
@@ -543,8 +547,8 @@
       </span>
       <span class="bottom-nav-label">Exames</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="relatorios">
-      <span class="bottom-nav-icon">
+    <a href="#relatorios" class="bottom-nav-item" data-view="relatorios">
+      <span class="bottom-nav-icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
           <path d="M22 12A10 10 0 0 0 12 2v10z" />
@@ -560,7 +564,7 @@
     <form id="form-trab" class="modal-card" novalidate>
       <div class="modal-head">
         <h3 id="mt-title" class="modal-title">Novo Trabalhador</h3>
-        <button type="button" class="close" data-close aria-label="Fechar">&times;</button>
+        <button type="button" class="close" data-close aria-label="Fechar">×</button>
       </div>
       <div class="modal-body">
         <div class="field">
@@ -570,7 +574,7 @@
         <div class="row-2">
           <div class="field">
             <label for="t-cpf">CPF / Identificador <span class="req">*</span></label>
-            <input id="t-cpf" class="input" required placeholder="000.000.000-00" inputmode="numeric">
+            <input id="t-cpf" class="input" required maxlength="14" placeholder="000.000.000-00" inputmode="numeric">
             <span id="t-cpf-err" class="error hidden"></span>
           </div>
           <div class="field">
@@ -595,7 +599,7 @@
     <form id="form-exame" class="modal-card" novalidate>
       <div class="modal-head">
         <h3 id="me-title" class="modal-title">Registrar Exame ou ASO</h3>
-        <button type="button" class="close" data-close aria-label="Fechar">&times;</button>
+        <button type="button" class="close" data-close aria-label="Fechar">×</button>
       </div>
       <div class="modal-body">
         <div class="field">
@@ -637,15 +641,15 @@
         <div class="field">
           <label>Documento digital <span class="req">*</span></label>
           <div class="seg" role="tablist">
-            <button type="button" class="on" data-doc="link">Colar link</button>
-            <button type="button" data-doc="file">Selecionar arquivo</button>
+            <button type="button" class="on" data-doc="link" role="tab" aria-selected="true">Colar link</button>
+            <button type="button" data-doc="file" role="tab" aria-selected="false">Selecionar arquivo</button>
           </div>
           <div id="doc-link">
             <input id="e-link" type="url" class="input" placeholder="https://drive.google.com/file/d/...">
           </div>
           <div id="doc-file" class="hidden">
             <label id="drop" class="drop" for="e-file">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto 6px;color:#3b82f6;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto 6px;color:#3b82f6;" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
@@ -671,10 +675,10 @@
     <form id="form-confirm" class="modal-card" style="max-width:440px" novalidate>
       <div class="modal-head">
         <h3 id="mc-title" class="modal-title">Confirmar Exclusão</h3>
-        <button type="button" class="close" data-close aria-label="Fechar">&times;</button>
+        <button type="button" class="close" data-close aria-label="Fechar">×</button>
       </div>
       <div class="modal-body">
-        <div class="confirm-body-icon">
+        <div class="confirm-body-icon" aria-hidden="true">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
@@ -695,7 +699,7 @@
     <form class="modal-card wide" novalidate onsubmit="return false">
       <div class="modal-head">
         <h3 id="md-title" class="modal-title">Documento Digital</h3>
-        <button type="button" class="close" data-close aria-label="Fechar">&times;</button>
+        <button type="button" class="close" data-close aria-label="Fechar">×</button>
       </div>
       <div id="md-body" class="modal-body"></div>
       <div class="modal-foot">

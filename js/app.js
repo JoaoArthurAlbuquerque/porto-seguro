@@ -1,16 +1,17 @@
 /**
- * Lógica da Aplicação SPA - Saúde Unificada
- * Redesenhada para proporcionar uma experiência acolhedora, amigável e de alta clareza
+ * Lógica da Aplicação SPA - Porto Seguro · Gestão Ocupacional
  */
 document.addEventListener("DOMContentLoaded", () => {
   const $ = (id) => document.getElementById(id);
+
   let trabalhadores = obterTrabalhadores();
   let exames = obterExames();
   let selecionadoId = trabalhadores[0]?.id ?? null;
   let vista = "dashboard";
-  let docModo = "link",
-    arquivoBlob = null,
-    arquivoNome = "";
+  let docModo = "link";
+  let arquivoBlob = null;
+  let arquivoNome = "";
+
   const emIframe = (() => {
     try {
       return window.self !== window.top;
@@ -24,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     alerta: { l: "A vencer", c: "warn" },
     vencidos: { l: "Vencido", c: "err" },
   };
+
   const MESES = [
     "Jan",
     "Fev",
@@ -39,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "Dez",
   ];
 
-  /* Paleta amigável de avatares com base no nome */
   const AVATAR_PALETTES = [
     { bg: "#eff6ff", color: "#2563eb" },
     { bg: "#f5f3ff", color: "#7c3aed" },
@@ -48,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { bg: "#fdf2f8", color: "#db2777" },
     { bg: "#f0fdfa", color: "#0d9488" },
   ];
+
   function avatarColor(name) {
     let hash = 0;
     for (let i = 0; i < (name || "").length; i++) hash += name.charCodeAt(i);
@@ -60,29 +62,33 @@ document.addEventListener("DOMContentLoaded", () => {
       /[&<>"']/g,
       (c) =>
         ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
+          "&": "&",
+          "<": "<",
+          ">": ">",
           '"': "&quot;",
-          "'": "&#39;",
+          "'": "'",
         })[c],
     );
+
   const norm = (s) =>
     String(s ?? "")
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
+
   const iniciais = (n) =>
-    n
+    String(n || "?")
       .split(" ")
       .filter(Boolean)
       .map((p) => p[0])
       .filter((_, i, a) => i === 0 || i === a.length - 1)
       .join("")
       .toUpperCase();
+
   const badge = (st) => `<span class="badge ${ST[st].c}">${ST[st].l}</span>`;
   const trabPorId = (id) => trabalhadores.find((t) => t.id === id);
   const examesDe = (id) => exames.filter((e) => e.trabalhadorId === id);
+
   const piorStatus = (lista) =>
     lista.some((e) => calcularStatusExame(e.dataVencimento) === "vencidos")
       ? "vencidos"
@@ -91,19 +97,31 @@ document.addEventListener("DOMContentLoaded", () => {
         : lista.length
           ? "validos"
           : "none";
+
   const docBtn = (ex, label = "Ver documento") =>
-    `<button class="btn btn-ghost btn-sm" data-docid="${esc(ex.id)}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> ${label}</button>`;
-  const ICO_EDIT = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`;
-  const ICO_DEL = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>`;
+    `<button type="button" class="btn btn-ghost btn-sm" data-docid="${esc(ex.id)}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> ${label}</button>`;
+
+  const ICO_EDIT = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`;
+  const ICO_DEL = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>`;
+
   const acoesExame = (ex) =>
-    `<button class="icon-act" data-edit-ex="${esc(ex.id)}" aria-label="Editar exame" title="Editar">${ICO_EDIT}</button><button class="icon-act del" data-del-ex="${esc(ex.id)}" aria-label="Excluir exame" title="Excluir">${ICO_DEL}</button>`;
+    `<button type="button" class="icon-act" data-edit-ex="${esc(ex.id)}" aria-label="Editar exame" title="Editar">${ICO_EDIT}</button><button type="button" class="icon-act del" data-del-ex="${esc(ex.id)}" aria-label="Excluir exame" title="Excluir">${ICO_DEL}</button>`;
+
   const empty = (t, s) =>
-    `<div class="empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><strong>${t}</strong><span>${s}</span></div>`;
+    `<div class="empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><strong>${t}</strong><span>${s}</span></div>`;
+
+  function syncBodyLock() {
+    const modalAberto = !!document.querySelector(".modal:not(.hidden)");
+    const menuAberto = $("sidebar").classList.contains("open");
+    document.body.classList.toggle("no-scroll", modalAberto || menuAberto);
+  }
+
   function toast(msg) {
     document.querySelector(".toast")?.remove();
     const t = document.createElement("div");
     t.className = "toast";
-    t.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> <span>${esc(msg)}</span>`;
+    t.setAttribute("role", "status");
+    t.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> <span>${esc(msg)}</span>`;
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2800);
   }
@@ -115,11 +133,13 @@ document.addEventListener("DOMContentLoaded", () => {
     status: $("f-status").value,
     ordem: $("f-ordem").value,
   });
+
   function aplicarFiltros(lista, { tipo, status, ordem }) {
     let r = lista;
     if (tipo !== "todos") r = r.filter((e) => e.tipo === tipo);
-    if (status !== "todos")
+    if (status !== "todos") {
       r = r.filter((e) => calcularStatusExame(e.dataVencimento) === status);
+    }
     const by =
       ordem === "vencimento"
         ? (a, b) => a.dataVencimento.localeCompare(b.dataVencimento)
@@ -128,11 +148,13 @@ document.addEventListener("DOMContentLoaded", () => {
           : (a, b) => b.dataRealizacao.localeCompare(a.dataRealizacao);
     return [...r].sort(by);
   }
+
   const exameCasaTermo = (e, q) =>
     !q ||
     norm(e.tipo).includes(q) ||
     norm(e.medico).includes(q) ||
     norm(e.laboratorio).includes(q);
+
   const trabCasaTermo = (t, q) =>
     !q ||
     norm(t.nome).includes(q) ||
@@ -140,14 +162,19 @@ document.addEventListener("DOMContentLoaded", () => {
     t.cpf.includes(q) ||
     norm(t.setor).includes(q) ||
     norm(t.empresa).includes(q);
+
   function syncFiltroUI() {
     const f = filtros();
+    const temFiltro = f.tipo !== "todos" || f.status !== "todos" || !!f.q;
     $("f-tipo").classList.toggle("is-set", f.tipo !== "todos");
     $("f-status").classList.toggle("is-set", f.status !== "todos");
-    $("f-clear").classList.toggle(
-      "hidden",
-      f.tipo === "todos" && f.status === "todos" && !f.q,
-    );
+    $("f-clear").classList.toggle("hidden", !temFiltro);
+
+    const summary = $("filter-summary");
+    if (summary) {
+      summary.textContent = temFiltro ? "Filtros ativos" : "";
+    }
+
     document
       .querySelectorAll(".kpi")
       .forEach((k) =>
@@ -164,16 +191,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- navegação ---------- */
   function irPara(v) {
+    if (!["dashboard", "trabalhadores", "exames", "relatorios"].includes(v)) {
+      v = "dashboard";
+    }
     vista = v;
-    document
-      .querySelectorAll(".nav-item, .bottom-nav-item")
-      .forEach((n) => n.classList.toggle("active", n.dataset.view === v));
+    document.querySelectorAll(".nav-item, .bottom-nav-item").forEach((n) => {
+      const ativo = n.dataset.view === v;
+      n.classList.toggle("active", ativo);
+      if (ativo) n.setAttribute("aria-current", "page");
+      else n.removeAttribute("aria-current");
+    });
     document
       .querySelectorAll(".view")
       .forEach((s) => s.classList.toggle("hidden", s.id !== `view-${v}`));
     fecharMenu();
     render();
   }
+
   function render() {
     syncFiltroUI();
     badgeNav();
@@ -184,6 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
       relatorios: renderRelatorios,
     })[vista]();
   }
+
   function contagens() {
     const c = { validos: 0, alerta: 0, vencidos: 0 };
     exames.forEach((e) => c[calcularStatusExame(e.dataVencimento)]++);
@@ -198,6 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
     c.base = comExame.length;
     return c;
   }
+
   function badgeNav() {
     const n = trabalhadores.filter(
       (t) => piorStatus(examesDe(t.id)) === "vencidos",
@@ -213,8 +249,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- DASHBOARD ---------- */
   function renderDashboard() {
-    const c = contagens(),
-      f = filtros();
+    const c = contagens();
+    const f = filtros();
+    const filtroDeExameAtivo = f.tipo !== "todos" || f.status !== "todos";
+
     $("k-total").textContent = exames.length;
     $("k-trab").textContent = trabalhadores.length;
     $("k-ok").textContent = c.validos;
@@ -222,33 +260,49 @@ document.addEventListener("DOMContentLoaded", () => {
     $("k-err").textContent = c.vencidos;
     $("conf-num").textContent = c.conf + "%";
     $("conf-bar").style.width = c.conf + "%";
+    $("conf-bar").parentElement?.setAttribute("aria-valuenow", c.conf);
     $("conf-frac").textContent = `${c.conformes}/${c.base}`;
+
     renderGrafico();
     renderAside();
 
-    // Filtro de trabalhadores
-    const lista = trabalhadores.filter(
-      (t) =>
-        trabCasaTermo(t, f.q) ||
-        examesDe(t.id).some((e) => exameCasaTermo(e, f.q)),
-    );
+    const lista = trabalhadores.filter((t) => {
+      const exTrab = examesDe(t.id);
+      const exFiltrados = aplicarFiltros(exTrab, f);
+      if (filtroDeExameAtivo && !exFiltrados.length) return false;
+      return (
+        trabCasaTermo(t, f.q) || exFiltrados.some((e) => exameCasaTermo(e, f.q))
+      );
+    });
+
     $("count-trab").textContent = lista.length;
-    if (lista.length && !lista.some((t) => t.id === selecionadoId))
+    if (lista.length && !lista.some((t) => t.id === selecionadoId)) {
       selecionadoId = lista[0].id;
+    }
+
     $("worker-list").innerHTML = lista.length
       ? lista
           .map((t) => {
-            const ps = piorStatus(examesDe(t.id));
+            const exTrab = examesDe(t.id);
+            const ps = piorStatus(exTrab);
             const pal = avatarColor(t.nome);
+            const selecionado = t.id === selecionadoId;
             return `
-      <button class="worker-item ${t.id === selecionadoId ? "active" : ""}" data-sel="${esc(t.id)}" role="option" aria-selected="${t.id === selecionadoId}">
-        <span class="avatar" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t.nome))}</span>
-        <div><div class="w-name">${esc(t.nome)}</div><div class="w-sub">${esc(t.setor)}</div></div>
-        <span class="dot ${ps === "none" ? "none" : ST[ps].c}"></span>
-      </button>`;
+              <button type="button" class="worker-item ${selecionado ? "active" : ""}" data-sel="${esc(t.id)}" role="option" aria-selected="${selecionado}">
+                <span class="avatar" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t.nome))}</span>
+                <div>
+                  <div class="w-name">${esc(t.nome)}</div>
+                  <div class="w-sub">${esc(t.setor)}</div>
+                </div>
+                <span class="dot ${ps === "none" ? "none" : ST[ps].c}" aria-hidden="true"></span>
+              </button>`;
           })
           .join("")
-      : empty("Nenhum trabalhador", "Ajuste os termos da busca.");
+      : empty(
+          "Nenhum trabalhador",
+          "Ajuste os termos ou filtros selecionados.",
+        );
+
     renderHistorico(
       lista.some((t) => t.id === selecionadoId)
         ? trabPorId(selecionadoId)
@@ -262,57 +316,79 @@ document.addEventListener("DOMContentLoaded", () => {
       $("worker-banner").innerHTML = "";
       $("timeline").innerHTML = empty(
         "Nenhum trabalhador selecionado",
-        "Selecione um colaborador na lista ao lado.",
+        "Selecione um colaborador para visualizar a linha do tempo.",
       );
       return;
     }
+
     const todos = examesDe(t.id);
     const pal = avatarColor(t.nome);
-    $("worker-banner").innerHTML =
-      `<div class="worker-banner"><span class="avatar lg" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t.nome))}</span>
-      <div style="flex:1;min-width:0"><div class="h2">${esc(t.nome)}</div>
-      <div class="meta"><span>CPF: ${esc(t.cpf)}</span><span>${esc(t.setor)}</span><span>${esc(t.empresa)}</span></div></div>
-      <div class="acts"><button class="icon-act" data-edit-trab="${esc(t.id)}" aria-label="Editar trabalhador" title="Editar">${ICO_EDIT}</button><button class="btn btn-primary btn-sm" data-add="${esc(t.id)}">+ Novo Exame</button></div></div>`;
-    
-    // termo só filtra exames se NÃO for o próprio trabalhador que casou
+    $("worker-banner").innerHTML = `
+      <div class="worker-banner">
+        <span class="avatar lg" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t.nome))}</span>
+        <div style="flex:1;min-width:0">
+          <div class="h2">${esc(t.nome)}</div>
+          <div class="meta">
+            <span>CPF: ${esc(t.cpf)}</span>
+            <span>${esc(t.setor)}</span>
+            <span>${esc(t.empresa)}</span>
+          </div>
+        </div>
+        <div class="acts">
+          <button type="button" class="icon-act" data-edit-trab="${esc(t.id)}" aria-label="Editar trabalhador" title="Editar">${ICO_EDIT}</button>
+          <button type="button" class="btn btn-primary btn-sm" data-add="${esc(t.id)}">+ Novo Exame</button>
+        </div>
+      </div>`;
+
     let lista = trabCasaTermo(t, f.q)
       ? todos
       : todos.filter((e) => exameCasaTermo(e, f.q));
     lista = aplicarFiltros(lista, f);
+
     if (!lista.length) {
       $("timeline").innerHTML = todos.length
-        ? empty("Nenhum exame com esses filtros", "Tente limpar os filtros selecionados.")
+        ? empty(
+            "Nenhum exame com esses filtros",
+            "Tente limpar os filtros selecionados.",
+          )
         : empty(
             "Sem exames registrados",
             "Registre o primeiro exame ocupacional deste colaborador.",
           );
       return;
     }
+
     $("timeline").innerHTML = lista
       .map((ex) => {
-        const st = calcularStatusExame(ex.dataVencimento),
-          d = parseLocalDate(ex.dataRealizacao),
-          dias = diasAte(ex.dataVencimento);
+        const st = calcularStatusExame(ex.dataVencimento);
+        const d = parseLocalDate(ex.dataRealizacao);
+        const dias = diasAte(ex.dataVencimento);
         const rel =
           st === "vencidos"
             ? `venceu há ${-dias} dia(s)`
             : st === "alerta"
               ? `vence em ${dias} dia(s)`
               : "";
-        return `<article class="exam">
-        <div class="exam-date"><b>${String(d.getDate()).padStart(2, "0")}</b><small>${MESES[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</small></div>
-        <div style="min-width:0"><div class="exam-title">${esc(ex.tipo)} ${badge(st)}</div>
-          <div class="exam-meta">Realização: ${formatarDataBR(ex.dataRealizacao)} · Validade: ${formatarDataBR(ex.dataVencimento)}${rel ? ` · <strong class="c-${ST[st].c}">${rel}</strong>` : ""}</div>
-          <div class="exam-meta2">${esc(ex.laboratorio)} · ${esc(ex.medico)}</div></div>
-        <div class="acts">${docBtn(ex)}${acoesExame(ex)}</div>
-      </article>`;
+        return `
+          <article class="exam">
+            <div class="exam-date">
+              <b>${String(d.getDate()).padStart(2, "0")}</b>
+              <small>${MESES[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</small>
+            </div>
+            <div style="min-width:0">
+              <div class="exam-title">${esc(ex.tipo)} ${badge(st)}</div>
+              <div class="exam-meta">Realização: ${formatarDataBR(ex.dataRealizacao)} · Validade: ${formatarDataBR(ex.dataVencimento)}${rel ? ` · <strong class="c-${ST[st].c}">${rel}</strong>` : ""}</div>
+              <div class="exam-meta2">${esc(ex.laboratorio)} · ${esc(ex.medico)}</div>
+            </div>
+            <div class="acts">${docBtn(ex)}${acoesExame(ex)}</div>
+          </article>`;
       })
       .join("");
   }
 
   function renderGrafico() {
-    const hoje = new Date(),
-      cols = [];
+    const hoje = new Date();
+    const cols = [];
     for (let i = 11; i >= 0; i--) {
       const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
       cols.push({ y: d.getFullYear(), m: d.getMonth(), n: 0 });
@@ -320,15 +396,21 @@ document.addEventListener("DOMContentLoaded", () => {
     exames.forEach((e) => {
       const d = parseLocalDate(e.dataRealizacao);
       const c = cols.find(
-        (c) => c.y === d.getFullYear() && c.m === d.getMonth(),
+        (col) => col.y === d.getFullYear() && col.m === d.getMonth(),
       );
       if (c) c.n++;
     });
     const max = Math.max(1, ...cols.map((c) => c.n));
     $("chart").innerHTML = cols
       .map(
-        (c, i) =>
-          `<div class="bar-col" title="${MESES[c.m]}/${c.y}: ${c.n} exame(s)"><div class="bar-track"><div class="bar ${i === 11 ? "current" : ""}" data-n="${c.n}" style="height:${Math.max(8, (c.n / max) * 100)}%"></div></div><span>${MESES[c.m]}</span></div>`,
+        (c, i) => `
+          <div class="bar-col ${c.n > 0 ? "has-data" : ""}" title="${MESES[c.m]}/${c.y}: ${c.n} exame(s)">
+            <span class="bar-val">${c.n}</span>
+            <div class="bar-track">
+              <div class="bar ${i === 11 ? "current" : ""}" style="height:${Math.max(8, (c.n / max) * 100)}%"></div>
+            </div>
+            <span class="bar-lbl">${MESES[c.m]}</span>
+          </div>`,
       )
       .join("");
   }
@@ -338,16 +420,26 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter((e) => calcularStatusExame(e.dataVencimento) !== "validos")
       .sort((a, b) => a.dataVencimento.localeCompare(b.dataVencimento))
       .slice(0, 5);
+
     $("upcoming").innerHTML = prox.length
       ? prox
           .map((e) => {
-            const t = trabPorId(e.trabalhadorId),
-              d = diasAte(e.dataVencimento),
-              st = calcularStatusExame(e.dataVencimento);
-            return `<button class="up-item" data-sel="${esc(e.trabalhadorId)}"><span class="dot ${ST[st].c}"></span><div style="min-width:0"><div class="up-name">${esc(t?.nome ?? "N/A")}</div><div class="subtle">${esc(e.tipo)} · ${formatarDataBR(e.dataVencimento)}</div></div><span class="up-days c-${ST[st].c}">${d < 0 ? `${-d}d atrás` : `em ${d}d`}</span></button>`;
+            const t = trabPorId(e.trabalhadorId);
+            const d = diasAte(e.dataVencimento);
+            const st = calcularStatusExame(e.dataVencimento);
+            return `
+              <button type="button" class="up-item" data-sel="${esc(e.trabalhadorId)}">
+                <span class="dot ${ST[st].c}" aria-hidden="true"></span>
+                <div style="min-width:0">
+                  <div class="up-name">${esc(t?.nome ?? "N/A")}</div>
+                  <div class="subtle">${esc(e.tipo)} · ${formatarDataBR(e.dataVencimento)}</div>
+                </div>
+                <span class="up-days c-${ST[st].c}">${d < 0 ? `${-d}d atrás` : d === 0 ? "hoje" : `em ${d}d`}</span>
+              </button>`;
           })
           .join("")
-      : `<p class="subtle" style="padding:8px 0">Todos os exames estão com a validade em dia! 🎉</p>`;
+      : `<p class="subtle" style="padding:8px 0">Todos os exames estão com a validade em dia!</p>`;
+
     const cnt = {};
     exames.forEach((e) => (cnt[e.tipo] = (cnt[e.tipo] || 0) + 1));
     const tot = exames.length || 1;
@@ -363,32 +455,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- TRABALHADORES ---------- */
   function renderTrabalhadores() {
-    const q = filtros().q,
-      lista = trabalhadores.filter((t) => trabCasaTermo(t, q));
+    const q = filtros().q;
+    const lista = trabalhadores.filter((t) => trabCasaTermo(t, q));
     $("grid-trab").innerHTML = lista.length
       ? lista
           .map((t) => {
-            const ex = examesDe(t.id),
-              c = { validos: 0, alerta: 0, vencidos: 0 };
+            const ex = examesDe(t.id);
+            const c = { validos: 0, alerta: 0, vencidos: 0 };
             ex.forEach((e) => c[calcularStatusExame(e.dataVencimento)]++);
             const pal = avatarColor(t.nome);
-            return `<article class="card w-card">
-        <div class="w-card-head"><span class="avatar lg" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t.nome))}</span><div style="min-width:0;flex:1"><h3>${esc(t.nome)}</h3><div class="subtle">${esc(t.setor)}</div></div>
-          <div class="acts"><button class="icon-act" data-edit-trab="${esc(t.id)}" aria-label="Editar trabalhador" title="Editar">${ICO_EDIT}</button><button class="icon-act del" data-del-trab="${esc(t.id)}" aria-label="Excluir trabalhador" title="Excluir">${ICO_DEL}</button></div></div>
-        <dl class="kv"><dt>CPF</dt><dd>${esc(t.cpf)}</dd><dt>Empresa</dt><dd>${esc(t.empresa)}</dd><dt>Exames</dt><dd>${ex.length}</dd></dl>
-        <div class="w-stats">${
-          ex.length
-            ? ["validos", "alerta", "vencidos"]
-                .filter((s) => c[s])
-                .map(
-                  (s) =>
-                    `<span class="badge ${ST[s].c}">${c[s]} ${ST[s].l.toLowerCase()}</span>`,
-                )
-                .join("")
-            : `<span class="badge neutral">Sem exames</span>`
-        }</div>
-        <div class="w-actions"><button class="btn btn-ghost btn-sm" data-hist="${esc(t.id)}">Ver Histórico</button><button class="btn btn-primary btn-sm" data-add="${esc(t.id)}">+ Exame</button></div>
-      </article>`;
+            return `
+              <article class="card w-card">
+                <div class="w-card-head">
+                  <span class="avatar lg" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t.nome))}</span>
+                  <div style="min-width:0;flex:1">
+                    <h3>${esc(t.nome)}</h3>
+                    <div class="subtle">${esc(t.setor)}</div>
+                  </div>
+                  <div class="acts">
+                    <button type="button" class="icon-act" data-edit-trab="${esc(t.id)}" aria-label="Editar trabalhador" title="Editar">${ICO_EDIT}</button>
+                    <button type="button" class="icon-act del" data-del-trab="${esc(t.id)}" aria-label="Excluir trabalhador" title="Excluir">${ICO_DEL}</button>
+                  </div>
+                </div>
+                <dl class="kv">
+                  <dt>CPF</dt><dd>${esc(t.cpf)}</dd>
+                  <dt>Empresa</dt><dd>${esc(t.empresa)}</dd>
+                  <dt>Exames</dt><dd>${ex.length}</dd>
+                </dl>
+                <div class="w-stats">${
+                  ex.length
+                    ? ["validos", "alerta", "vencidos"]
+                        .filter((s) => c[s])
+                        .map(
+                          (s) =>
+                            `<span class="badge ${ST[s].c}">${c[s]} ${ST[s].l.toLowerCase()}</span>`,
+                        )
+                        .join("")
+                    : `<span class="badge neutral">Sem exames</span>`
+                }</div>
+                <div class="w-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" data-hist="${esc(t.id)}">Ver Histórico</button>
+                  <button type="button" class="btn btn-primary btn-sm" data-add="${esc(t.id)}">+ Exame</button>
+                </div>
+              </article>`;
           })
           .join("")
       : `<div class="card" style="grid-column:1/-1;padding:24px">${empty("Nenhum trabalhador encontrado", "Ajuste os termos da busca ou cadastre um novo colaborador.")}</div>`;
@@ -404,14 +513,28 @@ document.addEventListener("DOMContentLoaded", () => {
       }),
       f,
     );
+
     $("tb-exames").innerHTML = lista.length
       ? lista
           .map((e) => {
             const t = trabPorId(e.trabalhadorId);
             const pal = avatarColor(t?.nome ?? "");
-            return `<tr><td><div class="cell-person"><span class="avatar" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t?.nome ?? "?"))}</span><strong>${esc(t?.nome ?? "N/A")}</strong></div></td>
-      <td><span class="chip">${esc(e.tipo)}</span></td><td class="nowrap">${formatarDataBR(e.dataRealizacao)}</td><td class="nowrap">${formatarDataBR(e.dataVencimento)}</td>
-      <td>${esc(e.laboratorio)}</td><td class="muted">${esc(e.medico)}</td><td>${badge(calcularStatusExame(e.dataVencimento))}</td><td style="text-align:right"><div class="acts">${docBtn(e, "Abrir")}${acoesExame(e)}</div></td></tr>`;
+            return `
+              <tr>
+                <td>
+                  <div class="cell-person">
+                    <span class="avatar" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t?.nome ?? "?"))}</span>
+                    <strong>${esc(t?.nome ?? "N/A")}</strong>
+                  </div>
+                </td>
+                <td><span class="chip">${esc(e.tipo)}</span></td>
+                <td class="nowrap">${formatarDataBR(e.dataRealizacao)}</td>
+                <td class="nowrap">${formatarDataBR(e.dataVencimento)}</td>
+                <td>${esc(e.laboratorio)}</td>
+                <td class="muted">${esc(e.medico)}</td>
+                <td>${badge(calcularStatusExame(e.dataVencimento))}</td>
+                <td style="text-align:right"><div class="acts">${docBtn(e, "Abrir")}${acoesExame(e)}</div></td>
+              </tr>`;
           })
           .join("")
       : `<tr><td colspan="8" style="padding:32px">${empty("Nenhum exame encontrado", "Ajuste a busca ou os filtros de tipo e status.")}</td></tr>`;
@@ -441,6 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .sort((a, b) => ordem[a.st] - ordem[b.st]);
   }
+
   function renderRelatorios() {
     const c = contagens();
     $("r-conf").textContent = c.conf + "%";
@@ -448,15 +572,26 @@ document.addEventListener("DOMContentLoaded", () => {
     $("r-warn").textContent = c.alerta;
     $("tb-pend").innerHTML =
       linhasPendencia()
-        .map(
-          ({ t, info }) => {
-            const pal = avatarColor(t.nome);
-            return `<tr><td><div class="cell-person"><span class="avatar" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t.nome))}</span><strong>${esc(t.nome)}</strong></div></td><td>${esc(t.setor)}</td><td>${esc(t.empresa)}</td><td><span class="badge ${info[0]}">${info[1]}</span></td><td class="muted">${info[2]}</td></tr>`;
-          }
-        )
+        .map(({ t, info }) => {
+          const pal = avatarColor(t.nome);
+          return `
+            <tr>
+              <td>
+                <div class="cell-person">
+                  <span class="avatar" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(t.nome))}</span>
+                  <strong>${esc(t.nome)}</strong>
+                </div>
+              </td>
+              <td>${esc(t.setor)}</td>
+              <td>${esc(t.empresa)}</td>
+              <td><span class="badge ${info[0]}">${info[1]}</span></td>
+              <td class="muted">${info[2]}</td>
+            </tr>`;
+        })
         .join("") ||
       `<tr><td colspan="5" style="padding:32px">${empty("Sem trabalhadores", "Cadastre o primeiro colaborador para monitorar.")}</td></tr>`;
   }
+
   function exportarCSV() {
     const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
     const rows = [
@@ -477,12 +612,14 @@ document.addEventListener("DOMContentLoaded", () => {
         info[2],
       ]),
     ];
-    const csv = rows.map((r) => r.map(q).join(";")).join("\n"),
-      nome = `conformidade-${new Date().toISOString().slice(0, 10)}.csv`;
+    const csv = rows.map((r) => r.map(q).join(";")).join("\n");
+    const nome = `conformidade-${new Date().toISOString().slice(0, 10)}.csv`;
     const url = URL.createObjectURL(
       new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }),
     );
+
     if (emIframe) {
+      if (docUrl) URL.revokeObjectURL(docUrl);
       docUrl = url;
       $("md-title").textContent = "Relatório CSV";
       $("md-body").innerHTML =
@@ -495,6 +632,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       return abrirModal("modal-doc");
     }
+
     const a = Object.assign(document.createElement("a"), {
       href: url,
       download: nome,
@@ -505,18 +643,21 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     toast("Relatório CSV gerado.");
   }
+
   function imprimir() {
     $("print-date").textContent =
       "Gerado em " + new Date().toLocaleString("pt-BR");
-    if (emIframe)
+    if (emIframe) {
       return toast(
         "Na pré-visualização, use Exportar → PDF do painel. Abrindo o arquivo localmente, este botão gera o PDF.",
       );
+    }
     window.print();
   }
 
   /* ---------- documentos ---------- */
   function mostrarDoc(titulo, url, tipo, nome) {
+    if (docUrl && docUrl !== url) URL.revokeObjectURL(docUrl);
     docUrl = url;
     $("md-title").textContent = titulo;
     $("md-body").innerHTML = tipo.startsWith("image/")
@@ -530,6 +671,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     abrirModal("modal-doc");
   }
+
   async function abrirDocumento(id) {
     const ex = exames.find((e) => e.id === id);
     if (!ex) return;
@@ -538,15 +680,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (ex.arquivoId) blob = await fileStore.get(ex.arquivoId);
       else if (ex.arquivo) blob = await (await fetch(ex.arquivo)).blob();
     } catch (e) {}
-    if (blob)
+
+    if (blob) {
       return mostrarDoc(
         `${ex.tipo} · ${trabPorId(ex.trabalhadorId)?.nome ?? ""}`,
         URL.createObjectURL(blob),
         blob.type || ex.arquivoTipo || "",
         ex.arquivoNome || "documento",
       );
-    if (ex.arquivoId || ex.arquivo)
+    }
+    if (ex.arquivoId || ex.arquivo) {
       return toast("Arquivo não encontrado neste navegador.");
+    }
     if (ex.linkDocumento) window.open(ex.linkDocumento, "_blank", "noopener");
     else toast("Documento não disponível.");
   }
@@ -561,6 +706,7 @@ document.addEventListener("DOMContentLoaded", () => {
       40,
     );
   }
+
   function excluirExame(id) {
     const ex = exames.find((e) => e.id === id);
     if (!ex) return;
@@ -575,6 +721,7 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     );
   }
+
   function excluirTrabalhador(id) {
     const t = trabPorId(id);
     if (!t) return;
@@ -595,11 +742,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ---------- modais ---------- */
-  let ultimoFoco = null,
-    editTrabId = null,
-    editExId = null,
-    docUrl = null,
-    confirmar = null;
+  let ultimoFoco = null;
+  let editTrabId = null;
+  let editExId = null;
+  let docUrl = null;
+  let confirmar = null;
+
   function abrirModal(id, trabId) {
     ultimoFoco = document.activeElement;
     if (id === "modal-trabalhador") {
@@ -615,6 +763,7 @@ document.addEventListener("DOMContentLoaded", () => {
         $("t-emp").value = t.empresa;
       }
     }
+
     if (id === "modal-exame") {
       if (!trabalhadores.length) {
         toast("Cadastre um trabalhador primeiro.");
@@ -627,8 +776,10 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         .join("");
       $("e-trab").value = trabId || selecionadoId || trabalhadores[0].id;
-      if (!$("e-real").value)
+      if (!$("e-real").value) {
         $("e-real").value = new Date().toISOString().slice(0, 10);
+      }
+
       const ex = editExId && exames.find((e) => e.id === editExId);
       $("me-title").textContent = ex
         ? "Editar Exame"
@@ -643,12 +794,15 @@ document.addEventListener("DOMContentLoaded", () => {
         $("e-med").value = ex.medico;
         if (ex.arquivoId || ex.arquivo) {
           setDocModo("file");
-          $("file-name").textContent =
-            `📎 ${ex.arquivoNome || "arquivo atual"} (mantido se não for trocado)`;
-        } else $("e-link").value = ex.linkDocumento || "";
+        } else {
+          setDocModo("link");
+          $("e-link").value = ex.linkDocumento || "";
+        }
       }
     }
+
     $(id).classList.remove("hidden");
+    syncBodyLock();
     setTimeout(
       () =>
         $(id)
@@ -657,7 +811,9 @@ document.addEventListener("DOMContentLoaded", () => {
       30,
     );
   }
+
   function fecharModal(m) {
+    if (!m) return;
     m.classList.add("hidden");
     const f = m.querySelector("form");
     f.reset();
@@ -665,31 +821,45 @@ document.addEventListener("DOMContentLoaded", () => {
       i.removeAttribute("aria-invalid"),
     );
     f.querySelectorAll(".error").forEach((e) => e.classList.add("hidden"));
+    if (m.id !== "modal-confirm") {
+      editTrabId = null;
+      editExId = null;
+    }
     if (m.id === "modal-exame") setDocModo("link");
     if (m.id === "modal-doc") {
       $("md-body").innerHTML = "";
       if (docUrl) URL.revokeObjectURL(docUrl);
       docUrl = null;
     }
-    if (m.id !== "modal-confirm") {
-      editTrabId = null;
-      editExId = null;
-    }
+    syncBodyLock();
     ultimoFoco?.focus?.();
   }
+
   function setDocModo(m) {
     docModo = m;
     arquivoBlob = null;
     arquivoNome = "";
-    $("file-name").textContent = "";
     $("e-file").value = "";
-    document
-      .querySelectorAll("[data-doc]")
-      .forEach((b) => b.classList.toggle("on", b.dataset.doc === m));
+    $("e-link").removeAttribute("aria-invalid");
+
+    const atual = editExId && exames.find((x) => x.id === editExId);
+    if (m === "file" && (atual?.arquivoId || atual?.arquivo)) {
+      $("file-name").textContent =
+        `📎 ${atual.arquivoNome || "arquivo atual"} (mantido se não for trocado)`;
+    } else {
+      $("file-name").textContent = "";
+    }
+
+    document.querySelectorAll("[data-doc]").forEach((b) => {
+      const ativo = b.dataset.doc === m;
+      b.classList.toggle("on", ativo);
+      b.setAttribute("aria-selected", ativo);
+    });
     $("doc-link").classList.toggle("hidden", m !== "link");
     $("doc-file").classList.toggle("hidden", m !== "file");
     $("doc-err").classList.add("hidden");
   }
+
   function lerArquivo(file) {
     if (!file) return;
     if (!/^(application\/pdf|image\/)/.test(file.type)) {
@@ -705,6 +875,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $("file-name").textContent = "📎 " + file.name;
     $("doc-err").classList.add("hidden");
   }
+
   function validar(form) {
     let ok = true;
     form.querySelectorAll("[required]").forEach((i) => {
@@ -716,9 +887,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ---------- menu mobile ---------- */
+  const abrirMenu = () => {
+    $("sidebar").classList.add("open");
+    $("overlay").classList.add("on");
+    syncBodyLock();
+  };
+
   const fecharMenu = () => {
     $("sidebar").classList.remove("open");
     $("overlay").classList.remove("on");
+    syncBodyLock();
   };
 
   /* ---------- eventos ---------- */
@@ -728,21 +906,22 @@ document.addEventListener("DOMContentLoaded", () => {
       irPara(n.dataset.view);
     }),
   );
-  $("menu-btn").addEventListener("click", () => {
-    $("sidebar").classList.add("open");
-    $("overlay").classList.add("on");
-  });
+
+  $("menu-btn").addEventListener("click", abrirMenu);
   $("sidebar-close-btn")?.addEventListener("click", fecharMenu);
   $("overlay").addEventListener("click", fecharMenu);
+
   ["q", "f-tipo", "f-status", "f-ordem"].forEach((id) =>
     $(id).addEventListener(id === "q" ? "input" : "change", render),
   );
+
   $("f-clear").addEventListener("click", () => {
     $("q").value = "";
     $("f-tipo").value = "todos";
     $("f-status").value = "todos";
     render();
   });
+
   document.querySelectorAll(".kpi").forEach((k) =>
     k.addEventListener("click", () => {
       const v = k.dataset.kpi;
@@ -751,8 +930,10 @@ document.addEventListener("DOMContentLoaded", () => {
       render();
     }),
   );
+
   $("btn-csv").addEventListener("click", exportarCSV);
   $("btn-print").addEventListener("click", imprimir);
+
   $("form-confirm").addEventListener("submit", (e) => {
     e.preventDefault();
     const fn = confirmar;
@@ -761,47 +942,58 @@ document.addEventListener("DOMContentLoaded", () => {
     fn?.();
   });
 
-  // delegação global
+  // Delegação global de cliques
   document.addEventListener("click", (e) => {
     const el = e.target.closest(
       "[data-open],[data-close],[data-docid],[data-sel],[data-add],[data-hist],[data-doc],[data-edit-ex],[data-del-ex],[data-edit-trab],[data-del-trab]",
     );
     if (!el) return;
+
     if (el.dataset.open) {
-      editTrabId = editExId = null;
+      editTrabId = null;
+      editExId = null;
       abrirModal(el.dataset.open);
-    } else if (el.hasAttribute("data-close")) fecharModal(el.closest(".modal"));
-    else if (el.dataset.docid) abrirDocumento(el.dataset.docid);
-    else if (el.dataset.add) {
+    } else if (el.hasAttribute("data-close")) {
+      fecharModal(el.closest(".modal"));
+    } else if (el.dataset.docid) {
+      abrirDocumento(el.dataset.docid);
+    } else if (el.dataset.add) {
       editExId = null;
       abrirModal("modal-exame", el.dataset.add);
     } else if (el.dataset.editEx) {
       editExId = el.dataset.editEx;
       abrirModal("modal-exame");
-    } else if (el.dataset.delEx) excluirExame(el.dataset.delEx);
-    else if (el.dataset.editTrab) {
+    } else if (el.dataset.delEx) {
+      excluirExame(el.dataset.delEx);
+    } else if (el.dataset.editTrab) {
       editTrabId = el.dataset.editTrab;
       abrirModal("modal-trabalhador");
-    } else if (el.dataset.delTrab) excluirTrabalhador(el.dataset.delTrab);
-    else if (el.dataset.hist) {
+    } else if (el.dataset.delTrab) {
+      excluirTrabalhador(el.dataset.delTrab);
+    } else if (el.dataset.hist) {
       selecionadoId = el.dataset.hist;
       $("q").value = "";
       irPara("dashboard");
     } else if (el.dataset.sel) {
       selecionadoId = el.dataset.sel;
       renderDashboard();
-      if (innerWidth <= 900)
+      if (window.innerWidth <= 900) {
         $("worker-banner").scrollIntoView({
           behavior: "smooth",
-          block: "start",
+          block: "nearest",
         });
-    } else if (el.dataset.doc) setDocModo(el.dataset.doc);
+      }
+    } else if (el.dataset.doc) {
+      setDocModo(el.dataset.doc);
+    }
   });
+
   document.querySelectorAll(".modal").forEach((m) =>
     m.addEventListener("mousedown", (e) => {
       if (e.target === m) fecharModal(m);
     }),
   );
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       const m = document.querySelector(".modal:not(.hidden)");
@@ -816,22 +1008,20 @@ document.addEventListener("DOMContentLoaded", () => {
       $("q").focus();
     }
   });
-  document
-    .querySelectorAll(".input")
-    .forEach((i) =>
-      i.addEventListener("input", () => i.removeAttribute("aria-invalid")),
-    );
 
-  // máscara de CPF
+  document.querySelectorAll(".input").forEach((i) =>
+    i.addEventListener("input", () => {
+      i.removeAttribute("aria-invalid");
+      if (i.id === "t-cpf") $("t-cpf-err").classList.add("hidden");
+    }),
+  );
+
+  // Máscara de CPF
   $("t-cpf").addEventListener("input", (e) => {
-    const d = e.target.value.replace(/\D/g, "");
-    if (d.length <= 11 && /^\d*$/.test(e.target.value.replace(/[.\-]/g, "")))
-      e.target.value = d
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    e.target.value = formatarCPF(e.target.value);
   });
-  // sugere vencimento +1 ano
+
+  // Sugere vencimento +1 ano
   $("e-real").addEventListener("change", () => {
     if (!$("e-venc").value && $("e-real").value) {
       const d = parseLocalDate($("e-real").value);
@@ -840,7 +1030,8 @@ document.addEventListener("DOMContentLoaded", () => {
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     }
   });
-  // arquivo: clique e arrastar
+
+  // Arquivo: clique e arrastar
   $("e-file").addEventListener("change", (e) => lerArquivo(e.target.files[0]));
   const drop = $("drop");
   ["dragover", "dragenter"].forEach((ev) =>
@@ -857,23 +1048,37 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   drop.addEventListener("drop", (e) => lerArquivo(e.dataTransfer.files[0]));
 
+  // Submit Trabalhador
   $("form-trab").addEventListener("submit", (e) => {
     e.preventDefault();
     const f = e.target;
     if (!validar(f)) return;
+
     const cpf = $("t-cpf").value.trim();
+    const tAtual = editTrabId ? trabPorId(editTrabId) : null;
+    const cpfInalteradoSeed = tAtual && tAtual.cpf === cpf;
+
+    if (!cpfInalteradoSeed && !validarCPF(cpf)) {
+      $("t-cpf").setAttribute("aria-invalid", true);
+      $("t-cpf-err").textContent = "Informe um CPF válido (11 dígitos).";
+      $("t-cpf-err").classList.remove("hidden");
+      return;
+    }
+
     if (trabalhadores.some((t) => t.cpf === cpf && t.id !== editTrabId)) {
       $("t-cpf").setAttribute("aria-invalid", true);
       $("t-cpf-err").textContent = "CPF já cadastrado.";
       $("t-cpf-err").classList.remove("hidden");
       return;
     }
+
     const dados = {
       nome: $("t-nome").value.trim(),
       cpf,
       setor: $("t-setor").value.trim(),
       empresa: $("t-emp").value.trim(),
     };
+
     const editando = !!editTrabId;
     let t;
     if (editando) {
@@ -883,6 +1088,7 @@ document.addEventListener("DOMContentLoaded", () => {
       t = { id: "trab-" + Date.now(), ...dados };
       trabalhadores.push(t);
     }
+
     salvarTrabalhadores(trabalhadores);
     selecionadoId = t.id;
     fecharModal($("modal-trabalhador"));
@@ -894,28 +1100,33 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   });
 
+  // Submit Exame
   $("form-exame").addEventListener("submit", async (e) => {
     e.preventDefault();
     const f = e.target;
     let ok = validar(f);
-    const r = $("e-real").value,
-      v = $("e-venc").value;
-    const datasOk = !(r && v && v < r);
+
+    const r = $("e-real").value;
+    const v = $("e-venc").value;
+    const datasOk = !(r && v && v <= r);
     $("e-venc-err").classList.toggle("hidden", datasOk);
     if (!datasOk) {
       $("e-venc").setAttribute("aria-invalid", true);
       ok = false;
     }
+
     const link = $("e-link").value.trim();
     const atual = editExId && exames.find((x) => x.id === editExId);
     const docOk =
       docModo === "file"
         ? !!(arquivoBlob || atual?.arquivoId || atual?.arquivo)
         : /^https?:\/\/\S+$/i.test(link);
+
     $("doc-err").classList.toggle("hidden", docOk);
     if (docModo === "link") $("e-link").setAttribute("aria-invalid", !docOk);
     if (!docOk) ok = false;
     if (!ok) return;
+
     const id = atual ? atual.id : "ex-" + Date.now();
     const ex = {
       id,
@@ -927,6 +1138,7 @@ document.addEventListener("DOMContentLoaded", () => {
       medico: $("e-med").value.trim(),
       linkDocumento: docModo === "link" ? link : "",
     };
+
     if (docModo === "file") {
       if (arquivoBlob) {
         await fileStore.put(id, arquivoBlob);
@@ -935,23 +1147,29 @@ document.addEventListener("DOMContentLoaded", () => {
           arquivoNome,
           arquivoTipo: arquivoBlob.type,
         });
-      } else
+      } else {
         Object.assign(ex, {
           arquivoId: atual.arquivoId,
           arquivo: atual.arquivo,
           arquivoNome: atual.arquivoNome,
           arquivoTipo: atual.arquivoTipo,
         });
-    } else if (atual?.arquivoId) fileStore.del(atual.arquivoId);
+      }
+    } else if (atual?.arquivoId) {
+      fileStore.del(atual.arquivoId);
+    }
+
     const backup = exames;
     exames = atual
       ? exames.map((x) => (x.id === id ? ex : x))
       : [...exames, ex];
+
     if (!salvarExames(exames)) {
       exames = backup;
       toast("Não foi possível salvar os dados.");
       return;
     }
+
     selecionadoId = ex.trabalhadorId;
     fecharModal($("modal-exame"));
     render();

@@ -1,10 +1,10 @@
 /**
- * Módulo de Dados e Persistência - Saúde Unificada
+ * Módulo de Dados e Persistência - Porto Seguro · Gestão Ocupacional
  */
 const STORAGE_KEY_TRABALHADORES = "saude_unificada_trabalhadores";
 const STORAGE_KEY_EXAMES = "saude_unificada_exames";
 
-/* Armazenamento com fallback em memória (localStorage indisponível/bloqueado) */
+/* Armazenamento com fallback em memória (caso localStorage esteja bloqueado) */
 const storage = (() => {
   const mem = {};
   try {
@@ -25,7 +25,7 @@ const storage = (() => {
   }
 })();
 
-/* Arquivos (Blob) no IndexedDB — sem o limite de ~5 MB do localStorage; fallback em memória */
+/* Arquivos (Blob) no IndexedDB — sem limite de ~5 MB do localStorage; fallback em memória */
 const fileStore = (() => {
   const mem = new Map();
   let dbp;
@@ -41,10 +41,10 @@ const fileStore = (() => {
   }
   const tx = async (mode, fn) => {
     const db = await dbp;
-    if (!db) throw 0;
+    if (!db) throw new Error("IndexedDB indisponível");
     return new Promise((res, rej) => {
-      const t = db.transaction("files", mode),
-        q = fn(t.objectStore("files"));
+      const t = db.transaction("files", mode);
+      const q = fn(t.objectStore("files"));
       t.oncomplete = () => res(q.result);
       t.onerror = () => rej(t.error);
     });
@@ -96,8 +96,10 @@ const INITIAL_TRABALHADORES = [
     empresa: "Masterboi Indústria S.A.",
   },
 ];
+
 const DUMMY =
   "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+
 const INITIAL_EXAMES = [
   {
     id: "ex-101",
@@ -148,40 +150,75 @@ function carregar(key, inicial) {
     return structuredClone(inicial);
   }
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : structuredClone(inicial);
   } catch {
     return structuredClone(inicial);
   }
 }
+
 function salvar(key, data) {
   try {
     storage.set(key, JSON.stringify(data));
     return true;
   } catch (e) {
     return false;
-  } // cota excedida
+  }
 }
+
 const obterTrabalhadores = () =>
   carregar(STORAGE_KEY_TRABALHADORES, INITIAL_TRABALHADORES);
 const obterExames = () => carregar(STORAGE_KEY_EXAMES, INITIAL_EXAMES);
 const salvarTrabalhadores = (t) => salvar(STORAGE_KEY_TRABALHADORES, t);
 const salvarExames = (e) => salvar(STORAGE_KEY_EXAMES, e);
 
+/* Utilitários de CPF */
+function formatarCPF(valor) {
+  const d = String(valor || "")
+    .replace(/\D/g, "")
+    .slice(0, 11);
+  return d
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+function validarCPF(cpf) {
+  const d = String(cpf || "").replace(/\D/g, "");
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+
+  let soma = 0;
+  for (let i = 0; i < 9; i++) soma += Number(d[i]) * (10 - i);
+  let resto = (soma * 10) % 11;
+  if (resto === 10) resto = 0;
+  if (resto !== Number(d[9])) return false;
+
+  soma = 0;
+  for (let i = 0; i < 10; i++) soma += Number(d[i]) * (11 - i);
+  resto = (soma * 10) % 11;
+  if (resto === 10) resto = 0;
+  return resto === Number(d[10]);
+}
+
+/* Utilitários de Data */
 function parseLocalDate(s) {
   if (!s) return new Date();
   const [y, m, d] = s.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
+
 function formatarDataBR(s) {
   if (!s) return "—";
   const p = s.split("-");
   return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : s;
 }
+
 function diasAte(s) {
   const h = new Date();
   h.setHours(0, 0, 0, 0);
   return Math.round((parseLocalDate(s) - h) / 864e5);
 }
+
 function calcularStatusExame(venc) {
   if (!venc) return "validos";
   const d = diasAte(venc);
