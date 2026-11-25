@@ -1842,3 +1842,370 @@ img.viewer {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ==========================================================================
+   NOVOS COMPONENTES VISUAIS (CRONOGRAMA, DONUT, ALERTA 30D E CENTRAL DOCS)
+   ========================================================================== */
+
+.side-status-pill {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--brand);
+  background: var(--brand-subtle);
+  border: 1px solid var(--brand-light);
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  margin: 0 auto 2px;
+}
+
+/* Cronograma Horizontal de ASO e Periódicos */
+.schedule-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+}
+
+.schedule-status-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sched-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+}
+
+.sched-pill.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.sched-pill.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.sched-pct {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--brand);
+  background: var(--brand-subtle);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.cronograma-track {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  position: relative;
+}
+
+.cronograma-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--surface-alt);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--t-fast) ease,
+    border-color var(--t-fast) ease,
+    background var(--t-fast) ease;
+}
+
+.cronograma-step:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.cronograma-node {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cronograma-node.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+  border: 1px solid var(--ok-border);
+}
+
+.cronograma-node.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+  border: 1px solid var(--warn-border);
+}
+
+.cronograma-node.err {
+  background: var(--err-bg);
+  color: var(--err);
+  border: 1px solid var(--err-border);
+}
+
+.cronograma-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cronograma-info strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cronograma-info span {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+/* Alerta de Vencimento (30 Dias) */
+.alert-banner-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fcd34d;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.08);
+}
+
+.alert-banner-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: #f59e0b;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.alert-banner-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #92400e;
+}
+
+.alert-banner-desc {
+  font-size: 12px;
+  color: #b45309;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Donut SVG no Card de Conformidade */
+.conf-donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: var(--sp-3) 0;
+}
+
+.conf-donut {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conf-donut-wrap .conf-card-main {
+  margin: 0;
+  min-width: 0;
+}
+
+/* Central de Documentos Digitais + Pré-visualização Inline */
+.docs-central-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.doc-mini-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--surface-alt);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--t-fast) ease,
+    border-color var(--t-fast) ease;
+}
+
+.doc-mini-item:hover {
+  background: #ffffff;
+  border-color: var(--brand);
+}
+
+.doc-pdf-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--err);
+  background: var(--err-bg);
+  border: 1px solid var(--err-border);
+  padding: 3px 6px;
+  border-radius: var(--radius-xs);
+  flex-shrink: 0;
+}
+
+.doc-mini-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.doc-mini-info strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-mini-info span {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+.doc-preview-box {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  background: var(--brand-subtle);
+  border: 1px solid var(--brand-light);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.doc-preview-sheet {
+  width: 44px;
+  height: 54px;
+  border-radius: var(--radius-xs);
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.doc-preview-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.doc-preview-lines span {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: #cbd5e1;
+}
+
+.doc-preview-lines span:last-child {
+  width: 65%;
+}
+
+.doc-preview-badge {
+  align-self: flex-end;
+  font-size: 8px;
+  font-weight: 800;
+  color: #ffffff;
+  background: var(--err);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.doc-preview-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.doc-preview-meta strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-preview-meta span {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-preview-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 2px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--brand);
+  text-align: left;
+  cursor: pointer;
+}
+
+.doc-preview-link:hover {
+  text-decoration: underline;
+}
+
+/* Card de Trabalhador com ação única limpa */
+.w-actions.single-action {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 1024px) {
+  .cronograma-track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-single-exam .lbl-exam {
+    font-size: 12px;
+  }
+
+  .cronograma-track {
+    grid-template-columns: 1fr;
+  }
+}

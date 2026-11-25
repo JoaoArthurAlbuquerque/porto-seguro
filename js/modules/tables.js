@@ -86,6 +86,73 @@ export function badgeNav() {
   }
 }
 
+/* ---------- CRONOGRAMA DE ASO E EXAMES PERIÓDICOS ---------- */
+function renderCronograma(c) {
+  const track = $("cronograma-track");
+  const pctEl = $("cronograma-pct");
+  if (!track) return;
+
+  const total = state.exames.length || 1;
+  const pctEmDia = Math.round(((c.validos + c.alerta) / total) * 100);
+  if (pctEl) pctEl.textContent = `${pctEmDia}% monitorado`;
+
+  const marcos = [...state.exames]
+    .sort((a, b) => a.dataVencimento.localeCompare(b.dataVencimento))
+    .slice(0, 4);
+
+  if (!marcos.length) {
+    track.innerHTML = `<p class="subtle">Nenhum exame registrado no cronograma.</p>`;
+    return;
+  }
+
+  track.innerHTML = marcos
+    .map((ex) => {
+      const st = calcularStatusExame(ex.dataVencimento);
+      const t = trabPorId(ex.trabalhadorId);
+      const cls = st === "validos" ? "ok" : st === "alerta" ? "warn" : "err";
+      const icon =
+        st === "validos"
+          ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`
+          : st === "alerta"
+            ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>`
+            : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+      return `
+        <button type="button" class="cronograma-step ${cls}" data-sel="${esc(ex.trabalhadorId)}" role="listitem">
+          <span class="cronograma-node ${cls}" aria-hidden="true">${icon}</span>
+          <div class="cronograma-info">
+            <strong>${esc(ex.tipo)} · ${esc(t?.nome.split(" ")[0] ?? "Colaborador")}</strong>
+            <span>Venc. ${formatarDataBR(ex.dataVencimento)}</span>
+          </div>
+        </button>`;
+    })
+    .join("");
+}
+
+/* ---------- GRÁFICO DONUT SVG DE CONFORMIDADE ---------- */
+function renderDonutConformidade(c) {
+  const el = $("conf-donut");
+  if (!el) return;
+
+  const total = Math.max(1, c.validos + c.alerta + c.vencidos);
+  const r = 30;
+  const circ = 2 * Math.PI * r;
+  const segOk = (c.validos / total) * circ;
+  const segWarn = (c.alerta / total) * circ;
+  const segErr = (c.vencidos / total) * circ;
+
+  el.innerHTML = `
+    <svg width="76" height="76" viewBox="0 0 76 76">
+      <circle cx="38" cy="38" r="${r}" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="8" />
+      <circle cx="38" cy="38" r="${r}" fill="none" stroke="#34d399" stroke-width="8"
+        stroke-dasharray="${segOk} ${circ}" stroke-dashoffset="0" transform="rotate(-90 38 38)" />
+      <circle cx="38" cy="38" r="${r}" fill="none" stroke="#fbbf24" stroke-width="8"
+        stroke-dasharray="${segWarn} ${circ}" stroke-dashoffset="${-segOk}" transform="rotate(-90 38 38)" />
+      <circle cx="38" cy="38" r="${r}" fill="none" stroke="#fb7185" stroke-width="8"
+        stroke-dasharray="${segErr} ${circ}" stroke-dashoffset="${-(segOk + segWarn)}" transform="rotate(-90 38 38)" />
+    </svg>`;
+}
+
 /* ---------- DASHBOARD ---------- */
 export function renderDashboard() {
   const c = calcularContagens();
@@ -107,8 +174,10 @@ export function renderDashboard() {
   const confFrac = $("conf-frac");
   if (confFrac) confFrac.textContent = `${c.conformes}/${c.base}`;
 
+  renderCronograma(c);
+  renderDonutConformidade(c);
   renderGrafico();
-  renderAside();
+  renderAside(c);
 
   const lista = state.trabalhadores.filter((t) => {
     const exTrab = examesDe(t.id);
@@ -180,7 +249,6 @@ export function renderHistorico(t, f) {
       </div>
       <div class="acts">
         <button type="button" class="icon-act" data-edit-trab="${esc(t.id)}" aria-label="Editar trabalhador" title="Editar">${ICO_EDIT}</button>
-        <button type="button" class="btn btn-primary btn-sm" data-add="${esc(t.id)}">+ Novo Exame</button>
       </div>
     </div>`;
 
@@ -197,7 +265,7 @@ export function renderHistorico(t, f) {
         )
       : emptyState(
           "Sem exames registrados",
-          "Registre o primeiro exame ocupacional deste colaborador.",
+          "Use o botão Novo Exame no topo para registrar o primeiro exame.",
         );
     return;
   }
@@ -259,7 +327,71 @@ function renderGrafico() {
     .join("");
 }
 
-function renderAside() {
+function renderAside(c) {
+  // 1. Alerta de Vencimento (30 Dias)
+  const alertDesc = $("alert-30d-desc");
+  if (alertDesc) {
+    const pendentes = c.alerta + c.vencidos;
+    alertDesc.textContent = pendentes
+      ? `${c.alerta} exame(s) vencem em até 30 dias e ${c.vencidos} já estão vencido(s).`
+      : "Nenhum exame vencido ou a vencer nos próximos 30 dias.";
+  }
+
+  // 2. Central de Documentos Digitais + Pré-visualização Inline
+  const docsList = $("docs-central-list");
+  const docsPreview = $("docs-central-preview");
+  if (docsList && docsPreview) {
+    const recentes = [...state.exames]
+      .sort((a, b) => b.dataRealizacao.localeCompare(a.dataRealizacao))
+      .slice(0, 3);
+
+    if (!recentes.length) {
+      docsList.innerHTML = `<p class="subtle">Nenhum documento anexado.</p>`;
+      docsPreview.innerHTML = "";
+    } else {
+      docsList.innerHTML = recentes
+        .map((ex) => {
+          const t = trabPorId(ex.trabalhadorId);
+          const nomeArquivo =
+            ex.arquivoNome ||
+            `${ex.tipo}_${(t?.nome || "Colaborador").replace(/\s+/g, "_")}.pdf`;
+          const st = calcularStatusExame(ex.dataVencimento);
+          return `
+            <button type="button" class="doc-mini-item" data-docid="${esc(ex.id)}">
+              <span class="doc-pdf-tag">PDF</span>
+              <div class="doc-mini-info">
+                <strong>${esc(nomeArquivo)}</strong>
+                <span>${esc(t?.nome ?? "N/A")} · ${formatarDataBR(ex.dataRealizacao)}</span>
+              </div>
+              <span class="dot ${ST[st].c}" aria-hidden="true"></span>
+            </button>`;
+        })
+        .join("");
+
+      const destaque =
+        recentes.find((e) => e.trabalhadorId === state.selecionadoId) ||
+        recentes[0];
+      const trabDestaque = trabPorId(destaque.trabalhadorId);
+      docsPreview.innerHTML = `
+        <div class="doc-preview-box">
+          <div class="doc-preview-sheet">
+            <div class="doc-preview-lines">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="doc-preview-badge">PDF</span>
+          </div>
+          <div class="doc-preview-meta">
+            <strong>${esc(destaque.tipo)} · ${esc(trabDestaque?.nome ?? "")}</strong>
+            <span>${esc(destaque.laboratorio)}</span>
+            <button type="button" class="doc-preview-link" data-docid="${esc(destaque.id)}">
+              Visualizar laudo completo →
+            </button>
+          </div>
+        </div>`;
+    }
+  }
+
+  // 3. Próximos Vencimentos
   const prox = state.exames
     .filter((e) => calcularStatusExame(e.dataVencimento) !== "validos")
     .sort((a, b) => a.dataVencimento.localeCompare(b.dataVencimento))
@@ -284,6 +416,7 @@ function renderAside() {
         .join("")
     : `<p class="subtle" style="padding:8px 0">Todos os exames estão com a validade em dia!</p>`;
 
+  // 4. Distribuição por Tipo
   const cnt = {};
   state.exames.forEach((e) => (cnt[e.tipo] = (cnt[e.tipo] || 0) + 1));
   const tot = state.exames.length || 1;
@@ -337,9 +470,8 @@ export function renderTrabalhadores() {
                       .join("")
                   : `<span class="badge neutral">Sem exames</span>`
               }</div>
-              <div class="w-actions">
-                <button type="button" class="btn btn-ghost btn-sm" data-hist="${esc(t.id)}">Ver Histórico</button>
-                <button type="button" class="btn btn-primary btn-sm" data-add="${esc(t.id)}">+ Exame</button>
+              <div class="w-actions single-action">
+                <button type="button" class="btn btn-ghost btn-sm" data-hist="${esc(t.id)}">Ver Histórico Ocupacional</button>
               </div>
             </article>`;
         })
