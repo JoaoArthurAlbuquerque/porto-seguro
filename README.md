@@ -1,4 +1,4 @@
-# Porto Seguro · Gestão Ocupacional
+# Porto Seguro
 
 Sistema moderno, intuitivo e responsivo para gestão preventiva de Saúde e Segurança do Trabalho (**SST**), monitoramento de **ASOs** (Atestados de Saúde Ocupacional), exames admissionais, periódicos, demissionais e conformidade com as Normas Regulamentadoras (**NR-07 / PCMSO**, **NR-01**, **NR-09**).
 
@@ -120,7 +120,7 @@ Projetada segundo as diretrizes da **Apple Human Interface Guidelines** e do **G
 ## 📁 Estrutura de Arquivos
 
 ```text
-porto-seguro-gestao-ocupacional/
+porto-seguro/
 │
 ├── index.html                 # Estrutura semântica SPA, views, modais e barra mobile
 ├── README.md                  # Documentação técnica e funcional do projeto
