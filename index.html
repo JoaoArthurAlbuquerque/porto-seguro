@@ -5,12 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#2f68ee">
-  <title>Porto Seguro · Gestão Ocupacional</title>
+  <meta name="description" content="Plataforma de Gestão Ocupacional, controle de ASOs, exames periódicos e conformidade regulatória.">
+  <title>Porto Seguro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
@@ -227,7 +228,7 @@
                         <line x1="12" y1="19" x2="12" y2="5" />
                         <polyline points="5 12 12 5 19 12" />
                       </svg>
-                      100% monitorados
+                      Monitoramento ativo
                     </span>
                   </div>
                 </div>
@@ -418,7 +419,7 @@
         </div>
         <div class="card table-card">
           <div class="table-wrap">
-            <table class="table">
+            <table class="table table-responsive">
               <thead>
                 <tr>
                   <th>Trabalhador</th>
@@ -428,7 +429,7 @@
                   <th>Local / Laboratório</th>
                   <th>Médico Responsável</th>
                   <th>Situação</th>
-                  <th style="text-align:right">Ações</th>
+                  <th class="th-actions">Ações</th>
                 </tr>
               </thead>
               <tbody id="tb-exames"></tbody>
@@ -446,6 +447,13 @@
             <p id="print-date" class="print-only subtle"></p>
           </div>
           <div class="view-head-actions">
+            <button id="btn-reset-demo" type="button" class="btn btn-ghost" title="Restaurar dados iniciais da demonstração">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+              </svg>
+              <span>Resetar Demo</span>
+            </button>
             <button id="btn-print" type="button" class="btn btn-ghost">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <polyline points="6 9 6 2 18 2 18 9" />
@@ -454,7 +462,7 @@
               </svg>
               <span>Imprimir / PDF</span>
             </button>
-            <button id="btn-csv" type="button" class="btn btn-ghost">
+            <button id="btn-csv" type="button" class="btn btn-primary">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
@@ -483,12 +491,12 @@
           </div>
         </div>
 
-        <div class="card table-card" style="margin-top:20px;">
+        <div class="card table-card report-table-card">
           <div class="card-head">
             <h2 class="h2">Pendências e Ações Recomendadas por Trabalhador</h2>
           </div>
           <div class="table-wrap">
-            <table class="table">
+            <table class="table table-responsive">
               <thead>
                 <tr>
                   <th>Trabalhador</th>
@@ -562,29 +570,38 @@
   <!-- ================= MODAL TRABALHADOR ================= -->
   <div id="modal-trabalhador" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="mt-title">
     <form id="form-trab" class="modal-card" novalidate>
+      <div class="sheet-handle" aria-hidden="true"></div>
       <div class="modal-head">
-        <h3 id="mt-title" class="modal-title">Novo Trabalhador</h3>
+        <div class="modal-head-group">
+          <h3 id="mt-title" class="modal-title">Novo Trabalhador</h3>
+          <button id="btn-demo-trab" type="button" class="demo-fill-btn" title="Preencher dados de exemplo para demonstração">
+            Preencher exemplo
+          </button>
+        </div>
         <button type="button" class="close" data-close aria-label="Fechar">×</button>
       </div>
       <div class="modal-body">
         <div class="field">
           <label for="t-nome">Nome completo <span class="req">*</span></label>
           <input id="t-nome" class="input" required placeholder="Ex.: João Silva Albuquerque">
+          <span class="error hidden" data-err-for="t-nome">Informe o nome completo do colaborador.</span>
         </div>
         <div class="row-2">
           <div class="field">
             <label for="t-cpf">CPF / Identificador <span class="req">*</span></label>
             <input id="t-cpf" class="input" required maxlength="14" placeholder="000.000.000-00" inputmode="numeric">
-            <span id="t-cpf-err" class="error hidden"></span>
+            <span id="t-cpf-err" class="error hidden" data-err-for="t-cpf">Informe um CPF válido (11 dígitos).</span>
           </div>
           <div class="field">
             <label for="t-setor">Cargo / Setor <span class="req">*</span></label>
             <input id="t-setor" class="input" required placeholder="Ex.: Operador de Produção">
+            <span class="error hidden" data-err-for="t-setor">Informe o cargo ou setor.</span>
           </div>
         </div>
         <div class="field">
           <label for="t-emp">Empresa / Unidade <span class="req">*</span></label>
           <input id="t-emp" class="input" required placeholder="Ex.: Masterboi Indústria S.A.">
+          <span class="error hidden" data-err-for="t-emp">Informe a empresa ou unidade.</span>
         </div>
       </div>
       <div class="modal-foot">
@@ -597,8 +614,14 @@
   <!-- ================= MODAL EXAME ================= -->
   <div id="modal-exame" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="me-title">
     <form id="form-exame" class="modal-card" novalidate>
+      <div class="sheet-handle" aria-hidden="true"></div>
       <div class="modal-head">
-        <h3 id="me-title" class="modal-title">Registrar Exame ou ASO</h3>
+        <div class="modal-head-group">
+          <h3 id="me-title" class="modal-title">Registrar Exame ou ASO</h3>
+          <button id="btn-demo-exame" type="button" class="demo-fill-btn" title="Preencher dados de exemplo para demonstração">
+            Preencher exemplo
+          </button>
+        </div>
         <button type="button" class="close" data-close aria-label="Fechar">×</button>
       </div>
       <div class="modal-body">
@@ -621,22 +644,25 @@
           <div class="field">
             <label for="e-lab">Local / Laboratório <span class="req">*</span></label>
             <input id="e-lab" class="input" required placeholder="Ex.: Laboratório Central do Recife">
+            <span class="error hidden" data-err-for="e-lab">Informe o laboratório ou clínica.</span>
           </div>
         </div>
         <div class="row-2">
           <div class="field">
             <label for="e-real">Data de realização <span class="req">*</span></label>
             <input id="e-real" type="date" class="input" required>
+            <span class="error hidden" data-err-for="e-real">Selecione a data de realização.</span>
           </div>
           <div class="field">
             <label for="e-venc">Data de vencimento <span class="req">*</span></label>
             <input id="e-venc" type="date" class="input" required>
-            <span id="e-venc-err" class="error hidden">O vencimento deve ser posterior à realização.</span>
+            <span id="e-venc-err" class="error hidden" data-err-for="e-venc">O vencimento deve ser posterior à realização.</span>
           </div>
         </div>
         <div class="field">
           <label for="e-med">Médico responsável <span class="req">*</span></label>
           <input id="e-med" class="input" required placeholder="Ex.: Dra. Maria Fernandes (CRM/PE 12345)">
+          <span class="error hidden" data-err-for="e-med">Informe o médico responsável e registro.</span>
         </div>
         <div class="field">
           <label>Documento digital <span class="req">*</span></label>
@@ -649,7 +675,7 @@
           </div>
           <div id="doc-file" class="hidden">
             <label id="drop" class="drop" for="e-file">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto 6px;color:#3b82f6;" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="drop-icon" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
@@ -660,7 +686,7 @@
             <input id="e-file" type="file" accept="application/pdf,image/*" class="sr-only">
             <span id="file-name" class="hint file-name-tag"></span>
           </div>
-          <span id="doc-err" class="error hidden">Informe um link válido ou selecione um arquivo.</span>
+          <span id="doc-err" class="error hidden">Informe um link válido (http/https) ou selecione um arquivo.</span>
         </div>
       </div>
       <div class="modal-foot">
@@ -672,7 +698,8 @@
 
   <!-- ================= MODAL CONFIRMAÇÃO ================= -->
   <div id="modal-confirm" class="modal hidden" role="alertdialog" aria-modal="true" aria-labelledby="mc-title">
-    <form id="form-confirm" class="modal-card" style="max-width:440px" novalidate>
+    <form id="form-confirm" class="modal-card modal-card-sm" novalidate>
+      <div class="sheet-handle" aria-hidden="true"></div>
       <div class="modal-head">
         <h3 id="mc-title" class="modal-title">Confirmar Exclusão</h3>
         <button type="button" class="close" data-close aria-label="Fechar">×</button>
@@ -685,7 +712,7 @@
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
         </div>
-        <p id="mc-msg" class="muted" style="text-align:center;font-size:14px;line-height:1.5;"></p>
+        <p id="mc-msg" class="muted confirm-msg"></p>
       </div>
       <div class="modal-foot">
         <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
@@ -697,6 +724,7 @@
   <!-- ================= MODAL VISUALIZADOR ================= -->
   <div id="modal-doc" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="md-title">
     <form class="modal-card wide" novalidate onsubmit="return false">
+      <div class="sheet-handle" aria-hidden="true"></div>
       <div class="modal-head">
         <h3 id="md-title" class="modal-title">Documento Digital</h3>
         <button type="button" class="close" data-close aria-label="Fechar">×</button>
@@ -709,8 +737,7 @@
     </form>
   </div>
 
-  <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,9 @@
+/* ==========================================================================
+   PORTO SEGURO · GESTÃO OCUPACIONAL — PONTO DE ENTRADA CSS
+   ========================================================================== */
+
+@import "./tokens.css";
+@import "./base.css";
+@import "./layout.css";
+@import "./components.css";
+@import "./animations.css";

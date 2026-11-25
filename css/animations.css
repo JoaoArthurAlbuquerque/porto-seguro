@@ -1,0 +1,215 @@
+/* ==========================================================================
+   ANIMATIONS — TRANSIÇÕES DE VIEW, ENTRADA ESCALONADA E MICROINTERAÇÕES
+   ========================================================================== */
+
+/* Transição suave ao alternar entre Dashboard, Trabalhadores, Exames e Relatórios */
+.view:not(.hidden) {
+  animation: viewEnter 0.28s var(--ease-out) both;
+}
+
+/* Entrada escalonada (stagger) nos KPIs */
+.kpis .kpi {
+  animation: cardRise 0.34s var(--ease-out) both;
+}
+
+.kpis .kpi:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.kpis .kpi:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.kpis .kpi:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.kpis .kpi:nth-child(4) {
+  animation-delay: 0.14s;
+}
+
+/* Entrada escalonada nos cards de trabalhadores e itens da linha do tempo */
+.grid-cards .w-card,
+.timeline .exam,
+.report-kpis .report-kpi-card {
+  animation: cardRise 0.32s var(--ease-out) both;
+}
+
+.grid-cards .w-card:nth-child(1),
+.timeline .exam:nth-child(1),
+.report-kpis .report-kpi-card:nth-child(1) {
+  animation-delay: 0.02s;
+}
+
+.grid-cards .w-card:nth-child(2),
+.timeline .exam:nth-child(2),
+.report-kpis .report-kpi-card:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.grid-cards .w-card:nth-child(3),
+.timeline .exam:nth-child(3),
+.report-kpis .report-kpi-card:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.grid-cards .w-card:nth-child(4),
+.timeline .exam:nth-child(4) {
+  animation-delay: 0.14s;
+}
+
+.grid-cards .w-card:nth-child(n + 5),
+.timeline .exam:nth-child(n + 5) {
+  animation-delay: 0.18s;
+}
+
+/* Crescimento vertical animado das barras do gráfico */
+.bar {
+  animation: barGrow 0.55s var(--ease-out) both;
+}
+
+.bar-col:nth-child(odd) .bar {
+  animation-delay: 0.04s;
+}
+
+.bar-col:nth-child(even) .bar {
+  animation-delay: 0.1s;
+}
+
+/* Pulso sutil no indicador de sessão ativa */
+.profile-status-dot,
+.mobile-brand-dot {
+  animation: statusPulse 2.6s ease-in-out infinite;
+}
+
+/* Brilho discreto no card de conformidade */
+.conf-card::after {
+  content: "";
+  position: absolute;
+  inset: -40% -20%;
+  background: radial-gradient(
+    circle at 85% 15%,
+    rgba(255, 255, 255, 0.18) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+/* Modais Desktop vs Mobile Bottom-Sheet */
+.modal:not(.hidden) {
+  animation: modalFade 0.2s var(--ease-out) both;
+}
+
+.modal:not(.hidden) .modal-card {
+  animation: modalPop 0.24s var(--ease-out) both;
+}
+
+@media (max-width: 768px) {
+  .modal:not(.hidden) .modal-card {
+    animation: sheetUp 0.28s var(--ease-out) both;
+  }
+}
+
+/* Notificação Toast */
+.toast {
+  animation: toastPop 0.24s var(--ease-spring) both;
+}
+
+/* ==========================================================================
+   KEYFRAMES
+   ========================================================================== */
+@keyframes viewEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes barGrow {
+  from {
+    transform: scaleY(0.08);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes statusPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.85;
+  }
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes toastPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   ACESSIBILIDADE — MOVIMENTO REDUZIDO
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
