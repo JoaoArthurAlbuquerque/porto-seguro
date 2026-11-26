@@ -6,8 +6,10 @@
 import {
   obterTrabalhadores,
   obterExames,
+  obterGestores,
   salvarTrabalhadores,
   salvarExames,
+  salvarGestores,
   resetarDadosDemo,
   calcularStatusExame,
 } from "../data.js";
@@ -17,13 +19,19 @@ const iniciaisTrabalhadores = obterTrabalhadores();
 export const state = {
   trabalhadores: iniciaisTrabalhadores,
   exames: obterExames(),
+  gestores: obterGestores(),
   selecionadoId: iniciaisTrabalhadores[0]?.id ?? null,
   vista: "dashboard",
+  equipeTab: "colaboradores",
+  pendTab: "vencidos",
+  periodoGrafico: "12m",
   docModo: "link",
   arquivoBlob: null,
   arquivoNome: "",
   editTrabId: null,
   editExId: null,
+  editGestorId: null,
+  renewExId: null,
   docUrl: null,
   confirmarFn: null,
   ultimoFoco: null,
@@ -109,6 +117,20 @@ export const badge = (st) => `<span class="badge ${ST[st].c}">${ST[st].l}</span>
 
 export const trabPorId = (id) => state.trabalhadores.find((t) => t.id === id);
 
+export const gestorPorId = (id) => state.gestores.find((g) => g.id === id);
+
+export const gestorDaEmpresa = (empresa) =>
+  state.gestores.find(
+    (g) => norm(g.empresa) === norm(empresa),
+  );
+
+export const empresasDisponiveis = () => {
+  const set = new Set();
+  state.trabalhadores.forEach((t) => t.empresa && set.add(t.empresa.trim()));
+  state.gestores.forEach((g) => g.empresa && set.add(g.empresa.trim()));
+  return [...set].sort((a, b) => a.localeCompare(b, "pt-BR"));
+};
+
 export const examesDe = (id) =>
   state.exames.filter((e) => e.trabalhadorId === id);
 
@@ -124,19 +146,22 @@ export const piorStatus = (lista) =>
 export function persistirTudo() {
   const okT = salvarTrabalhadores(state.trabalhadores);
   const okE = salvarExames(state.exames);
-  return okT && okE;
+  const okG = salvarGestores(state.gestores);
+  return okT && okE && okG;
 }
 
 export function restaurarDemoState() {
-  const { trabalhadores, exames } = resetarDadosDemo();
+  const { trabalhadores, exames, gestores } = resetarDadosDemo();
   state.trabalhadores = trabalhadores;
   state.exames = exames;
+  state.gestores = gestores;
   state.selecionadoId = trabalhadores[0]?.id ?? null;
 }
 
 /* ---------- Filtros e Métricas ---------- */
 export const lerFiltros = () => ({
   q: norm($("q")?.value.trim() ?? ""),
+  empresa: $("f-empresa")?.value ?? "todas",
   tipo: $("f-tipo")?.value ?? "todos",
   status: $("f-status")?.value ?? "todos",
   ordem: $("f-ordem")?.value ?? "recentes",
@@ -171,10 +196,20 @@ export const trabCasaTermo = (t, q) =>
   norm(t.setor).includes(q) ||
   norm(t.empresa).includes(q);
 
-export function calcularContagens() {
-  const c = { validos: 0, alerta: 0, vencidos: 0 };
-  state.exames.forEach((e) => c[calcularStatusExame(e.dataVencimento)]++);
-  const comExame = state.trabalhadores.filter((t) => examesDe(t.id).length);
+export function calcularContagens(empresa = "todas") {
+  const trabsBase =
+    empresa === "todas"
+      ? state.trabalhadores
+      : state.trabalhadores.filter((t) => t.empresa === empresa);
+  const trabIds = new Set(trabsBase.map((t) => t.id));
+  const examesBase =
+    empresa === "todas"
+      ? state.exames
+      : state.exames.filter((e) => trabIds.has(e.trabalhadorId));
+
+  const c = { validos: 0, alerta: 0, vencidos: 0, total: examesBase.length };
+  examesBase.forEach((e) => c[calcularStatusExame(e.dataVencimento)]++);
+  const comExame = trabsBase.filter((t) => examesDe(t.id).length);
   const conformes = comExame.filter(
     (t) => piorStatus(examesDe(t.id)) !== "vencidos",
   ).length;
@@ -183,12 +218,17 @@ export function calcularContagens() {
     : 100;
   c.conformes = conformes;
   c.base = comExame.length;
+  c.trabs = trabsBase.length;
   return c;
 }
 
-export function linhasPendencia() {
+export function linhasPendencia(empresa = "todas") {
   const ordem = { vencidos: 0, alerta: 1, none: 2, validos: 3 };
-  return state.trabalhadores
+  const trabsBase =
+    empresa === "todas"
+      ? state.trabalhadores
+      : state.trabalhadores.filter((t) => t.empresa === empresa);
+  return trabsBase
     .map((t) => {
       const st = piorStatus(examesDe(t.id));
       const info = {

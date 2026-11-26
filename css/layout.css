@@ -146,50 +146,43 @@
   text-align: center;
 }
 
-/* Card CTA da Sidebar */
-.side-card {
+/* Indicador Discreto de Status no Rodapé da Sidebar */
+.side-footer-status {
   margin-top: auto;
-  background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-4);
   display: flex;
   flex-direction: column;
+  gap: 2px;
+}
+
+.side-status-row {
+  display: flex;
   align-items: center;
-  text-align: center;
-  gap: var(--sp-3);
+  gap: 8px;
 }
 
-.side-card-illus {
-  display: flex;
-  justify-content: center;
-  margin-top: -4px;
+.side-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok-dot);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  flex-shrink: 0;
 }
 
-.side-card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.side-card-title {
-  font-size: 13.5px;
+.side-status-text {
+  font-size: 12px;
   font-weight: 700;
   color: var(--ink-primary);
 }
 
-.side-card-desc {
-  font-size: 11.5px;
-  color: var(--ink-secondary);
-  line-height: 1.45;
-}
-
-.side-card-btn {
-  width: 100%;
-  font-size: 12.5px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  margin-top: 2px;
+.side-status-sub {
+  font-size: 11px;
+  color: var(--ink-muted);
+  padding-left: 16px;
 }
 
 /* ==========================================================================
@@ -207,13 +200,29 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 10px 14px;
+  box-shadow: var(--shadow-card);
 }
 
 .search {
   position: relative;
   flex: 1;
-  max-width: 580px;
+  max-width: 480px;
   min-width: 0;
+}
+
+.session-company-filter {
+  flex-shrink: 0;
+  max-width: 220px;
+}
+
+.select-empresa {
+  height: var(--tap-min);
+  max-width: 100%;
+  text-overflow: ellipsis;
 }
 
 .search-icon {
@@ -531,12 +540,17 @@
     position: sticky;
     top: 0;
     z-index: 45;
-    background: rgba(241, 245, 249, 0.92);
+    background: rgba(255, 255, 255, 0.94);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     margin: calc(var(--page-py) * -1) calc(var(--page-px) * -1) 0;
     padding: 12px var(--page-px);
-    border-bottom: 1px solid rgba(219, 227, 238, 0.75);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid rgba(219, 227, 238, 0.85);
+    box-shadow: none;
   }
 
   .split {
@@ -713,6 +727,16 @@
     order: 3;
     flex: 1 1 100%;
     max-width: 100%;
+  }
+
+  .session-company-filter {
+    order: 4;
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .select-empresa {
+    width: 100%;
   }
 
   .search input {

@@ -4,12 +4,30 @@
  */
 
 import { fileStore, formatarCPF, validarCPF, parseLocalDate } from "../data.js";
-import { state, $, trabPorId, persistirTudo } from "./state.js";
-import { fecharModal, setDocModo } from "./navigation.js";
+import { state, $, trabPorId, gestorPorId, persistirTudo } from "./state.js";
+import { abrirModal, fecharModal, setDocModo } from "./navigation.js";
 import { toast } from "./animations.js";
 
 let demoTrabIdx = 0;
 let demoExameIdx = 0;
+let demoGestorIdx = 0;
+
+const DEMO_GESTORES = [
+  {
+    nome: "Renata Siqueira Campos",
+    cargo: "Gerente de Recursos Humanos",
+    empresa: "Estaleiro Atlântico Sul",
+    email: "renata.campos@eas.com.br",
+    telefone: "(81) 99102-4490",
+  },
+  {
+    nome: "Eduardo Albuquerque Lima",
+    cargo: "Diretor de Operações & SST",
+    empresa: "Masterboi Indústria S.A.",
+    email: "eduardo.lima@masterboi.com.br",
+    telefone: "(81) 99741-8820",
+  },
+];
 
 const DEMO_TRABALHADORES = [
   {
@@ -122,6 +140,44 @@ function preencherExemploExame() {
     .forEach((el) => el.classList.add("hidden"));
 }
 
+function preencherExemploGestor() {
+  const amostra = DEMO_GESTORES[demoGestorIdx % DEMO_GESTORES.length];
+  demoGestorIdx++;
+
+  $("g-nome").value = amostra.nome;
+  $("g-cargo").value = amostra.cargo;
+  $("g-emp").value = amostra.empresa;
+  $("g-email").value = amostra.email;
+  $("g-tel").value = amostra.telefone;
+
+  $("form-gestor")
+    .querySelectorAll("[aria-invalid]")
+    .forEach((el) => el.removeAttribute("aria-invalid"));
+  $("form-gestor")
+    .querySelectorAll(".error")
+    .forEach((el) => el.classList.add("hidden"));
+}
+
+export function anexarArquivoRapido(file) {
+  if (!file) return false;
+  if (!/^(application\/pdf|image\/)/.test(file.type)) {
+    toast("Envie um PDF ou uma imagem.", "warn");
+    return false;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    toast("Arquivo acima de 10 MB. Use um link (Drive/URL).", "warn");
+    return false;
+  }
+  state.arquivoBlob = file;
+  state.arquivoNome = file.name;
+  state.editExId = null;
+  state.renewExId = null;
+  abrirModal("modal-exame");
+  setDocModo("file", true);
+  toast(`Arquivo "${file.name}" pronto para vínculo.`);
+  return true;
+}
+
 function lerArquivo(file) {
   if (!file) return;
   if (!/^(application\/pdf|image\/)/.test(file.type)) {
@@ -188,6 +244,7 @@ export function initForms(onRender) {
   // Botões de demonstração rápida para o Pitch
   $("btn-demo-trab")?.addEventListener("click", preencherExemploTrabalhador);
   $("btn-demo-exame")?.addEventListener("click", preencherExemploExame);
+  $("btn-demo-gestor")?.addEventListener("click", preencherExemploGestor);
 
   // Upload e Drag & Drop
   $("e-file")?.addEventListener("change", (e) => lerArquivo(e.target.files[0]));
@@ -349,5 +406,50 @@ export function initForms(onRender) {
     fecharModal($("modal-exame"));
     onRender();
     toast(atual ? "Exame atualizado." : "Exame registrado com sucesso!");
+  });
+
+  // Submit Gestor / Empresa
+  $("form-gestor")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = e.target;
+    let ok = validarCamposObrigatorios(f);
+
+    const email = $("g-email").value.trim();
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (email && !emailOk) {
+      $("g-email").setAttribute("aria-invalid", true);
+      $("g-email-err").classList.remove("hidden");
+      ok = false;
+    }
+
+    if (!ok) {
+      focarPrimeiroInvalido(f);
+      return;
+    }
+
+    const dados = {
+      nome: $("g-nome").value.trim(),
+      cargo: $("g-cargo").value.trim(),
+      empresa: $("g-emp").value.trim(),
+      email,
+      telefone: $("g-tel").value.trim(),
+    };
+
+    const editando = Boolean(state.editGestorId);
+    if (editando) {
+      const g = gestorPorId(state.editGestorId);
+      if (g) Object.assign(g, dados);
+    } else {
+      state.gestores.push({ id: "gest-" + Date.now(), ...dados });
+    }
+
+    persistirTudo();
+    fecharModal($("modal-gestor"));
+    onRender();
+    toast(
+      editando
+        ? "Dados do gestor atualizados."
+        : `Gestor ${dados.nome.split(" ")[0]} cadastrado com sucesso!`,
+    );
   });
 }

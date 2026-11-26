@@ -29,8 +29,9 @@ import {
   renderRelatorios,
   prepararExclusaoExame,
   prepararExclusaoTrabalhador,
+  prepararExclusaoGestor,
 } from "./modules/tables.js";
-import { initForms } from "./modules/forms.js";
+import { initForms, anexarArquivoRapido } from "./modules/forms.js";
 import { toast } from "./modules/animations.js";
 
 function render() {
@@ -59,16 +60,56 @@ document.addEventListener("DOMContentLoaded", () => {
   $("overlay")?.addEventListener("click", fecharMenu);
 
   // Busca e filtros
-  ["q", "f-tipo", "f-status", "f-ordem"].forEach((id) =>
+  ["q", "f-empresa", "f-tipo", "f-status", "f-ordem"].forEach((id) =>
     $(id)?.addEventListener(id === "q" ? "input" : "change", render),
   );
 
   $("f-clear")?.addEventListener("click", () => {
     $("q").value = "";
+    if ($("f-empresa")) $("f-empresa").value = "todas";
     $("f-tipo").value = "todos";
     $("f-status").value = "todos";
     render();
   });
+
+  // Botão único (+ Novo Registro) com menu dropdown
+  const btnNovoReg = $("btn-novo-registro");
+  const menuNovoReg = $("novo-registro-menu");
+  const fecharMenuNovoReg = () => {
+    menuNovoReg?.classList.add("hidden");
+    btnNovoReg?.setAttribute("aria-expanded", "false");
+  };
+  btnNovoReg?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const aberto = !menuNovoReg?.classList.contains("hidden");
+    menuNovoReg?.classList.toggle("hidden", aberto);
+    btnNovoReg.setAttribute("aria-expanded", String(!aberto));
+  });
+
+  // Exportação rápida no Card de Conformidade
+  $("btn-quick-pdf")?.addEventListener("click", imprimirRelatorio);
+  $("btn-quick-csv")?.addEventListener("click", exportarCSV);
+
+  // Drag & Drop direto na Central de Documentos Digitais
+  const docsCard = $("docs-central-card");
+  if (docsCard) {
+    ["dragover", "dragenter"].forEach((ev) =>
+      docsCard.addEventListener(ev, (e) => {
+        e.preventDefault();
+        docsCard.classList.add("drag-over");
+      }),
+    );
+    ["dragleave", "drop"].forEach((ev) =>
+      docsCard.addEventListener(ev, (e) => {
+        e.preventDefault();
+        docsCard.classList.remove("drag-over");
+      }),
+    );
+    docsCard.addEventListener("drop", (e) => {
+      const file = e.dataTransfer?.files?.[0];
+      if (file) anexarArquivoRapido(file);
+    });
+  }
 
   // Atalho de filtro pelos cards de KPI
   document.querySelectorAll(".kpi").forEach((k) =>
@@ -105,14 +146,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Delegação global de cliques
   document.addEventListener("click", (e) => {
+    if (!e.target.closest(".cta-menu-wrap")) {
+      fecharMenuNovoReg();
+    }
+
     const el = e.target.closest(
-      "[data-open],[data-close],[data-docid],[data-sel],[data-add],[data-hist],[data-doc],[data-edit-ex],[data-del-ex],[data-edit-trab],[data-del-trab]",
+      "[data-open],[data-close],[data-docid],[data-sel],[data-add],[data-hist],[data-doc],[data-edit-ex],[data-del-ex],[data-renew-ex],[data-edit-trab],[data-del-trab],[data-edit-gestor],[data-del-gestor],[data-periodo],[data-pend-tab],[data-equipe-tab]",
     );
     if (!el) return;
 
     if (el.dataset.open) {
+      fecharMenuNovoReg();
       state.editTrabId = null;
       state.editExId = null;
+      state.editGestorId = null;
+      state.renewExId = null;
       abrirModal(el.dataset.open);
     } else if (el.hasAttribute("data-close")) {
       fecharModal(el.closest(".modal"));
@@ -120,8 +168,14 @@ document.addEventListener("DOMContentLoaded", () => {
       abrirDocumento(el.dataset.docid);
     } else if (el.dataset.add) {
       state.editExId = null;
+      state.renewExId = null;
       abrirModal("modal-exame", el.dataset.add);
+    } else if (el.dataset.renewEx) {
+      state.editExId = null;
+      state.renewExId = el.dataset.renewEx;
+      abrirModal("modal-exame");
     } else if (el.dataset.editEx) {
+      state.renewExId = null;
       state.editExId = el.dataset.editEx;
       abrirModal("modal-exame");
     } else if (el.dataset.delEx) {
@@ -143,6 +197,24 @@ document.addEventListener("DOMContentLoaded", () => {
           toast(msg);
         },
       );
+    } else if (el.dataset.editGestor) {
+      state.editGestorId = el.dataset.editGestor;
+      abrirModal("modal-gestor");
+    } else if (el.dataset.delGestor) {
+      prepararExclusaoGestor(el.dataset.delGestor, pedirConfirmacao, (msg) => {
+        persistirTudo();
+        render();
+        toast(msg);
+      });
+    } else if (el.dataset.periodo) {
+      state.periodoGrafico = el.dataset.periodo;
+      render();
+    } else if (el.dataset.pendTab) {
+      state.pendTab = el.dataset.pendTab;
+      render();
+    } else if (el.dataset.equipeTab) {
+      state.equipeTab = el.dataset.equipeTab;
+      render();
     } else if (el.dataset.hist) {
       state.selecionadoId = el.dataset.hist;
       $("q").value = "";
@@ -192,6 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (e.key === "Escape") {
+      fecharMenuNovoReg();
       if (modalAtivo) fecharModal(modalAtivo);
       else fecharMenu();
     }

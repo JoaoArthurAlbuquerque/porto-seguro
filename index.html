@@ -87,24 +87,13 @@
         </a>
       </nav>
 
-      <!-- Card Institucional (sem botão redundante de exame) -->
-      <div class="side-card">
-        <div class="side-card-illus" aria-hidden="true">
-          <svg width="136" height="86" viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="25" y="18" width="110" height="76" rx="14" fill="#EFF6FF" />
-            <circle cx="80" cy="44" r="21" fill="#DBEAFE" />
-            <path d="M80 33c4.5-5 12-2 12 4.5 0 6.5-12 13-12 13s-12-6.5-12-13c0-6.5 7.5-9.5 12-4.5z" fill="#2563EB" opacity="0.9" />
-            <rect x="42" y="68" width="76" height="6" rx="3" fill="#93C5FD" />
-            <rect x="52" y="78" width="56" height="5" rx="2.5" fill="#BFDBFE" />
-            <circle cx="34" cy="28" r="9" fill="#10B981" />
-            <path d="M30.5 28l2.5 2.5 4.5-4.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
+      <!-- Indicador Discreto de Status no Rodapé do Menu -->
+      <div class="side-footer-status">
+        <div class="side-status-row">
+          <span class="side-status-dot" aria-hidden="true"></span>
+          <span class="side-status-text">NR-07 · PCMSO Ativo</span>
         </div>
-        <div class="side-card-content">
-          <span class="side-status-pill">NR-07 · PCMSO Ativo</span>
-          <strong class="side-card-title">Prontuário Unificado</strong>
-          <p class="side-card-desc">Controle preventivo de ASOs, prazos e laudos digitais em um único painel.</p>
-        </div>
+        <span class="side-status-sub">Prontuário Unificado</span>
       </div>
     </aside>
 
@@ -133,29 +122,59 @@
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input id="q" type="search" placeholder="Buscar trabalhador, exame, setor ou médico..." autocomplete="off">
+          <input id="q" type="search" placeholder="Buscar por nome, CPF ou tipo de exame..." autocomplete="off">
           <kbd aria-hidden="true">/</kbd>
         </label>
 
-        <div class="topbar-actions">
-          <button type="button" class="btn btn-ghost" data-open="modal-trabalhador" title="Cadastrar Trabalhador" aria-label="Cadastrar Trabalhador">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <line x1="19" y1="8" x2="19" y2="14" />
-              <line x1="16" y1="11" x2="22" y2="11" />
-            </svg>
-            <span class="lbl">Trabalhador</span>
-          </button>
+        <div class="session-company-filter">
+          <select id="f-empresa" class="select select-empresa" aria-label="Filtrar por empresa ou unidade">
+            <option value="todas">Todas as empresas</option>
+          </select>
+        </div>
 
-          <!-- ÚNICO BOTÃO DE NOVO EXAME EM TODO O PROJETO -->
-          <button id="btn-novo-exame" type="button" class="btn btn-primary btn-single-exam" data-open="modal-exame" title="Registrar Novo Exame">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            <span class="lbl-exam">Novo Exame</span>
-          </button>
+        <div class="topbar-actions">
+          <!-- BOTÃO ÚNICO DE AÇÃO PRINCIPAL (+ NOVO REGISTRO) -->
+          <div class="cta-menu-wrap">
+            <button id="btn-novo-registro" type="button" class="btn btn-primary btn-single-cta" aria-haspopup="menu" aria-expanded="false" aria-controls="novo-registro-menu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>Novo Registro</span>
+              <svg class="cta-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            <div id="novo-registro-menu" class="cta-dropdown hidden" role="menu" aria-labelledby="btn-novo-registro">
+              <button type="button" class="cta-dropdown-item" role="menuitem" data-open="modal-exame">
+                <span class="cta-item-icon ic-blue" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </span>
+                <span>
+                  <strong>Exame ou ASO</strong>
+                  <small>Vincular laudo a colaborador</small>
+                </span>
+              </button>
+              <button type="button" class="cta-dropdown-item" role="menuitem" data-open="modal-trabalhador">
+                <span class="cta-item-icon ic-ok" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </span>
+                <span>
+                  <strong>Colaborador</strong>
+                  <small>Novo trabalhador na unidade</small>
+                </span>
+              </button>
+              <button type="button" class="cta-dropdown-item" role="menuitem" data-open="modal-gestor">
+                <span class="cta-item-icon ic-warn" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </span>
+                <span>
+                  <strong>Gestor / Empresa</strong>
+                  <small>Responsável pela unidade</small>
+                </span>
+              </button>
+            </div>
+          </div>
 
           <div class="user-profile-widget" title="Sessão ativa · Gestão Ocupacional">
             <div class="profile-avatar">
@@ -232,7 +251,7 @@
             <div class="card card-pad hero-card">
               <div class="hero-header">
                 <div>
-                  <div class="eyebrow">Total de Exames Registrados</div>
+                  <div id="hero-eyebrow" class="eyebrow">Exames nos Últimos 12 Meses</div>
                   <div class="hero-num-wrapper">
                     <span id="k-total" class="hero-num">0</span>
                     <span class="trend-badge positive">
@@ -244,14 +263,9 @@
                     </span>
                   </div>
                 </div>
-                <div class="hero-period-pill">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                  </svg>
-                  <span>Últimos 12 meses</span>
+                <div class="seg hero-period-seg" role="group" aria-label="Período do indicador">
+                  <button type="button" class="on" data-periodo="12m" aria-pressed="true">Últimos 12 meses</button>
+                  <button type="button" data-periodo="all" aria-pressed="false">Todo o período</button>
                 </div>
               </div>
 
@@ -357,24 +371,9 @@
             </div>
           </div>
 
-          <!-- Right Sidebar / Activity, Alert & Digital Docs Panel -->
-          <aside class="dash-aside" aria-label="Resumo, Alertas e Documentos">
-            <!-- Card de Alerta de Vencimento (30 Dias) — Destaque do vídeo -->
-            <div id="alert-30d-card" class="alert-banner-card">
-              <div class="alert-banner-icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                  <line x1="12" y1="9" x2="12" y2="13" />
-                  <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
-              </div>
-              <div class="alert-banner-body">
-                <div class="alert-banner-title">Alerta de Vencimento (30 Dias)</div>
-                <p id="alert-30d-desc" class="alert-banner-desc">Verificando exames próximos do vencimento...</p>
-              </div>
-            </div>
-
-            <!-- Card de Auditoria + Gráfico Donut SVG -->
+          <!-- Right Sidebar / Activity, Docs & Pending Panel -->
+          <aside class="dash-aside" aria-label="Conformidade, Documentos e Pendências">
+            <!-- Card de Auditoria + Gráfico Donut SVG + Exportação Rápida -->
             <div class="conf-card">
               <div class="conf-card-header">
                 <span class="conf-card-tag">AUDITORIA DE CONFORMIDADE</span>
@@ -391,23 +390,48 @@
               <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progresso de conformidade">
                 <i id="conf-bar" style="width:0"></i>
               </div>
+              <div class="conf-quick-actions">
+                <button id="btn-quick-pdf" type="button" class="conf-action-btn" title="Imprimir ou salvar relatório em PDF">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  <span>Exportar PDF</span>
+                </button>
+                <button id="btn-quick-csv" type="button" class="conf-action-btn" title="Exportar relatório de conformidade em CSV">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Exportar CSV</span>
+                </button>
+              </div>
             </div>
 
-            <!-- Central de Documentos Digitais + Pré-visualização Inline -->
-            <div class="card card-pad docs-central-card">
+            <!-- Central de Documentos Digitais + Drag-and-Drop Direto -->
+            <div id="docs-central-card" class="card card-pad docs-central-card">
               <div class="card-section-header">
                 <div class="eyebrow">Central de Documentos Digitais</div>
-                <span class="subtle-badge">Laudos & PDFs</span>
+                <span class="subtle-badge">Arraste PDF</span>
+              </div>
+              <div id="docs-drop-hint" class="docs-drop-hint">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <span>Solte um PDF/imagem aqui para anexar laudo</span>
               </div>
               <div id="docs-central-list" class="docs-central-list"></div>
               <div id="docs-central-preview" class="docs-central-preview"></div>
             </div>
 
-            <!-- Próximos Vencimentos -->
+            <!-- Pendências e Vencimentos (Abas: Vencidos | A vencer) -->
             <div class="card card-pad upcoming-card">
               <div class="card-section-header">
-                <div class="eyebrow">Próximos Vencimentos</div>
-                <span class="subtle-badge">Atenção</span>
+                <div class="eyebrow">Pendências e Vencimentos</div>
+              </div>
+              <div class="seg pend-tabs" role="tablist" aria-label="Filtrar pendências">
+                <button type="button" class="on" data-pend-tab="vencidos" role="tab" aria-selected="true">
+                  Vencidos <span id="pend-tab-err-count" class="tab-pill err">0</span>
+                </button>
+                <button type="button" data-pend-tab="alerta" role="tab" aria-selected="false">
+                  A vencer <span id="pend-tab-warn-count" class="tab-pill warn">0</span>
+                </button>
               </div>
               <div id="upcoming" class="upcoming"></div>
             </div>
@@ -424,24 +448,42 @@
         </div>
       </section>
 
-      <!-- ================= VIEW: TRABALHADORES ================= -->
+      <!-- ================= VIEW: TRABALHADORES & GESTORES ================= -->
       <section id="view-trabalhadores" class="view hidden">
         <div class="view-head">
           <div>
-            <h1 class="h1">Trabalhadores</h1>
-            <p>Consulte, edite e gerencie o quadro de colaboradores cadastrados.</p>
+            <h1 class="h1">Equipe & Empresas</h1>
+            <p>Gerencie colaboradores e gestores vinculados às respectivas empresas e unidades.</p>
           </div>
-          <button type="button" class="btn btn-ghost" data-open="modal-trabalhador">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <line x1="19" y1="8" x2="19" y2="14" />
-              <line x1="16" y1="11" x2="22" y2="11" />
-            </svg>
-            <span>Novo Trabalhador</span>
+          <div class="view-head-actions">
+            <button type="button" class="btn btn-ghost" data-open="modal-gestor">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+              </svg>
+              <span>Novo Gestor</span>
+            </button>
+            <button type="button" class="btn btn-primary" data-open="modal-trabalhador">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="19" y1="8" x2="19" y2="14" />
+                <line x1="16" y1="11" x2="22" y2="11" />
+              </svg>
+              <span>Novo Colaborador</span>
+            </button>
+          </div>
+        </div>
+        <div class="seg equipe-tabs" role="tablist" aria-label="Alternar entre colaboradores e gestores">
+          <button type="button" class="on" data-equipe-tab="colaboradores" role="tab" aria-selected="true">
+            Colaboradores <span id="tab-count-trab" class="tab-pill neutral">0</span>
+          </button>
+          <button type="button" data-equipe-tab="gestores" role="tab" aria-selected="false">
+            Gestores & Empresas <span id="tab-count-gest" class="tab-pill neutral">0</span>
           </button>
         </div>
         <div id="grid-trab" class="grid-cards"></div>
+        <div id="grid-gestores" class="grid-cards hidden"></div>
       </section>
 
       <!-- ================= VIEW: EXAMES & ASOS ================= -->
@@ -629,13 +671,65 @@
         </div>
         <div class="field">
           <label for="t-emp">Empresa / Unidade <span class="req">*</span></label>
-          <input id="t-emp" class="input" required placeholder="Ex.: Masterboi Indústria S.A.">
+          <input id="t-emp" class="input" required list="empresas-datalist" placeholder="Ex.: Masterboi Indústria S.A.">
           <span class="error hidden" data-err-for="t-emp">Informe a empresa ou unidade.</span>
         </div>
       </div>
       <div class="modal-foot">
         <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
         <button id="mt-submit" type="submit" class="btn btn-primary">Salvar Trabalhador</button>
+      </div>
+    </form>
+  </div>
+
+  <datalist id="empresas-datalist"></datalist>
+
+  <!-- ================= MODAL GESTOR / EMPRESA ================= -->
+  <div id="modal-gestor" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="mg-title">
+    <form id="form-gestor" class="modal-card" novalidate>
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="modal-head">
+        <div class="modal-head-group">
+          <h3 id="mg-title" class="modal-title">Novo Gestor</h3>
+          <button id="btn-demo-gestor" type="button" class="demo-fill-btn" title="Preencher dados de exemplo para demonstração">
+            Preencher exemplo
+          </button>
+        </div>
+        <button type="button" class="close" data-close aria-label="Fechar">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="g-nome">Nome do gestor <span class="req">*</span></label>
+          <input id="g-nome" class="input" required placeholder="Ex.: Carlos Eduardo Menezes">
+          <span class="error hidden" data-err-for="g-nome">Informe o nome do gestor.</span>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="g-cargo">Cargo / Função <span class="req">*</span></label>
+            <input id="g-cargo" class="input" required placeholder="Ex.: Gerente de SST">
+            <span class="error hidden" data-err-for="g-cargo">Informe o cargo ou função.</span>
+          </div>
+          <div class="field">
+            <label for="g-emp">Empresa / Unidade <span class="req">*</span></label>
+            <input id="g-emp" class="input" required list="empresas-datalist" placeholder="Ex.: Masterboi Indústria S.A.">
+            <span class="error hidden" data-err-for="g-emp">Informe a empresa vinculada.</span>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="g-email">E-mail corporativo <span class="req">*</span></label>
+            <input id="g-email" type="email" class="input" required placeholder="gestor@empresa.com.br">
+            <span id="g-email-err" class="error hidden" data-err-for="g-email">Informe um e-mail válido.</span>
+          </div>
+          <div class="field">
+            <label for="g-tel">Telefone / WhatsApp</label>
+            <input id="g-tel" type="tel" class="input" placeholder="(81) 99999-0000">
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+        <button id="mg-submit" type="submit" class="btn btn-primary">Salvar Gestor</button>
       </div>
     </form>
   </div>

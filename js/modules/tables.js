@@ -20,6 +20,9 @@ import {
   avatarColor,
   badge,
   trabPorId,
+  gestorPorId,
+  gestorDaEmpresa,
+  empresasDisponiveis,
   examesDe,
   piorStatus,
   lerFiltros,
@@ -44,8 +47,25 @@ export const emptyState = (t, s) =>
   `<div class="empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><strong>${t}</strong><span>${s}</span></div>`;
 
 export function syncFiltroUI() {
+  const selEmp = $("f-empresa");
+  if (selEmp) {
+    const atual = selEmp.value || "todas";
+    const empresas = empresasDisponiveis();
+    selEmp.innerHTML =
+      `<option value="todas">Todas as empresas</option>` +
+      empresas
+        .map((e) => `<option value="${esc(e)}">${esc(e)}</option>`)
+        .join("");
+    selEmp.value = empresas.includes(atual) ? atual : "todas";
+    selEmp.classList.toggle("is-set", selEmp.value !== "todas");
+  }
+
   const f = lerFiltros();
-  const temFiltro = f.tipo !== "todos" || f.status !== "todos" || !!f.q;
+  const temFiltro =
+    f.tipo !== "todos" ||
+    f.status !== "todos" ||
+    f.empresa !== "todas" ||
+    !!f.q;
   $("f-tipo")?.classList.toggle("is-set", f.tipo !== "todos");
   $("f-status")?.classList.toggle("is-set", f.status !== "todos");
   $("f-clear")?.classList.toggle("hidden", !temFiltro);
@@ -61,6 +81,28 @@ export function syncFiltroUI() {
     k.classList.toggle("selected", selecionado);
     k.setAttribute("aria-pressed", String(selecionado));
   });
+
+  document.querySelectorAll("[data-periodo]").forEach((b) => {
+    const ativo = b.dataset.periodo === state.periodoGrafico;
+    b.classList.toggle("on", ativo);
+    b.setAttribute("aria-pressed", String(ativo));
+  });
+
+  document.querySelectorAll("[data-pend-tab]").forEach((b) => {
+    const ativo = b.dataset.pendTab === state.pendTab;
+    b.classList.toggle("on", ativo);
+    b.setAttribute("aria-selected", String(ativo));
+  });
+
+  document.querySelectorAll("[data-equipe-tab]").forEach((b) => {
+    const ativo = b.dataset.equipeTab === state.equipeTab;
+    b.classList.toggle("on", ativo);
+    b.setAttribute("aria-selected", String(ativo));
+  });
+
+  $("grid-trab")?.classList.toggle("hidden", state.equipeTab !== "colaboradores");
+  $("grid-gestores")?.classList.toggle("hidden", state.equipeTab !== "gestores");
+
   $("filters")?.classList.toggle(
     "hidden",
     !["dashboard", "exames"].includes(state.vista),
@@ -85,16 +127,21 @@ export function badgeNav() {
 }
 
 /* ---------- CRONOGRAMA DE ASO E EXAMES PERIÓDICOS ---------- */
-function renderCronograma(c) {
+function renderCronograma(c, empresa = "todas") {
   const track = $("cronograma-track");
   const pctEl = $("cronograma-pct");
   if (!track) return;
 
-  const total = state.exames.length || 1;
+  const examesBase =
+    empresa === "todas"
+      ? state.exames
+      : state.exames.filter((e) => trabPorId(e.trabalhadorId)?.empresa === empresa);
+
+  const total = examesBase.length || 1;
   const pctEmDia = Math.round(((c.validos + c.alerta) / total) * 100);
   if (pctEl) pctEl.textContent = `${pctEmDia}% monitorado`;
 
-  const marcos = [...state.exames]
+  const marcos = [...examesBase]
     .sort((a, b) => a.dataVencimento.localeCompare(b.dataVencimento))
     .slice(0, 4);
 
@@ -153,12 +200,22 @@ function renderDonutConformidade(c) {
 
 /* ---------- DASHBOARD ---------- */
 export function renderDashboard() {
-  const c = calcularContagens();
   const f = lerFiltros();
+  const c = calcularContagens(f.empresa);
   const filtroDeExameAtivo = f.tipo !== "todos" || f.status !== "todos";
 
-  animarContador($("k-total"), state.exames.length);
-  animarContador($("k-trab"), state.trabalhadores.length);
+  const total12m = renderGrafico(f.empresa);
+  const totalExibido = state.periodoGrafico === "12m" ? total12m : c.total;
+  const heroEyebrow = $("hero-eyebrow");
+  if (heroEyebrow) {
+    heroEyebrow.textContent =
+      state.periodoGrafico === "12m"
+        ? "Exames nos Últimos 12 Meses"
+        : "Total de Exames Registrados";
+  }
+
+  animarContador($("k-total"), totalExibido);
+  animarContador($("k-trab"), c.trabs);
   animarContador($("k-ok"), c.validos);
   animarContador($("k-warn"), c.alerta);
   animarContador($("k-err"), c.vencidos);
@@ -172,12 +229,12 @@ export function renderDashboard() {
   const confFrac = $("conf-frac");
   if (confFrac) confFrac.textContent = `${c.conformes}/${c.base}`;
 
-  renderCronograma(c);
+  renderCronograma(c, f.empresa);
   renderDonutConformidade(c);
-  renderGrafico();
-  renderAside(c);
+  renderAside(c, f.empresa);
 
   const lista = state.trabalhadores.filter((t) => {
+    if (f.empresa !== "todas" && t.empresa !== f.empresa) return false;
     const exTrab = examesDe(t.id);
     const exFiltrados = aplicarFiltros(exTrab, f);
     if (filtroDeExameAtivo && !exFiltrados.length) return false;
@@ -290,62 +347,80 @@ export function renderHistorico(t, f) {
             <div class="exam-meta">Realização: ${formatarDataBR(ex.dataRealizacao)} · Validade: ${formatarDataBR(ex.dataVencimento)}${rel ? ` · <strong class="c-${ST[st].c}">${rel}</strong>` : ""}</div>
             <div class="exam-meta2">${esc(ex.laboratorio)} · ${esc(ex.medico)}</div>
           </div>
-          <div class="acts">${docBtn(ex)}${acoesExame(ex)}</div>
+          <div class="acts">${st === "vencidos" ? `<button type="button" class="btn-renew btn-renew-inline" data-renew-ex="${esc(ex.id)}" title="Renovar exame em 1 clique">Renovar</button>` : ""}${docBtn(ex)}${acoesExame(ex)}</div>
         </article>`;
     })
     .join("");
 }
 
-function renderGrafico() {
+function renderGrafico(empresa = "todas") {
   const hoje = new Date();
   const cols = [];
   for (let i = 11; i >= 0; i--) {
     const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
     cols.push({ y: d.getFullYear(), m: d.getMonth(), n: 0 });
   }
-  state.exames.forEach((e) => {
+  const examesBase =
+    empresa === "todas"
+      ? state.exames
+      : state.exames.filter((e) => trabPorId(e.trabalhadorId)?.empresa === empresa);
+
+  examesBase.forEach((e) => {
     const d = parseLocalDate(e.dataRealizacao);
     const c = cols.find(
       (col) => col.y === d.getFullYear() && col.m === d.getMonth(),
     );
     if (c) c.n++;
   });
-  const max = Math.max(1, ...cols.map((c) => c.n));
+
+  const max = Math.max(4, ...cols.map((c) => c.n));
   const total12m = cols.reduce((acc, c) => acc + c.n, 0);
   const chartEl = $("chart");
-  chartEl?.setAttribute(
+  if (!chartEl) return total12m;
+
+  let yAxis = $("chart-y-axis");
+  if (!yAxis && chartEl.parentElement) {
+    yAxis = document.createElement("div");
+    yAxis.id = "chart-y-axis";
+    yAxis.className = "chart-y-axis";
+    yAxis.setAttribute("aria-hidden", "true");
+    chartEl.parentElement.insertBefore(yAxis, chartEl);
+  }
+  if (yAxis) {
+    yAxis.innerHTML = `<span>${max}</span><span>${Math.round(max / 2)}</span><span>0</span>`;
+  }
+
+  chartEl.setAttribute(
     "aria-label",
     `Gráfico de exames realizados nos últimos 12 meses: ${total12m} exame(s) no período`,
   );
   chartEl.innerHTML = cols
     .map(
       (c, i) => `
-        <div class="bar-col ${c.n > 0 ? "has-data" : ""}" title="${MESES[c.m]}/${c.y}: ${c.n} exame(s)" aria-hidden="true">
+        <div class="bar-col ${c.n > 0 ? "has-data" : "is-empty"}" title="${MESES[c.m]}/${c.y}: ${c.n} exame(s)" aria-hidden="true">
           <span class="bar-val">${c.n}</span>
           <div class="bar-track">
-            <div class="bar ${i === 11 ? "current" : ""}" style="height:${Math.max(8, (c.n / max) * 100)}%"></div>
+            <div class="bar ${i === 11 ? "current" : ""}" style="height:${c.n > 0 ? Math.max(12, Math.round((c.n / max) * 100)) : 4}%"></div>
           </div>
           <span class="bar-lbl">${MESES[c.m]}</span>
         </div>`,
     )
     .join("");
+
+  return total12m;
 }
 
-function renderAside(c) {
-  // 1. Alerta de Vencimento (30 Dias)
-  const alertDesc = $("alert-30d-desc");
-  if (alertDesc) {
-    const pendentes = c.alerta + c.vencidos;
-    alertDesc.textContent = pendentes
-      ? `${c.alerta} exame(s) vencem em até 30 dias e ${c.vencidos} já estão vencido(s).`
-      : "Nenhum exame vencido ou a vencer nos próximos 30 dias.";
-  }
+function renderAside(c, empresa = "todas") {
+  const examesBase =
+    empresa === "todas"
+      ? state.exames
+      : state.exames.filter((e) => trabPorId(e.trabalhadorId)?.empresa === empresa);
 
-  // 2. Central de Documentos Digitais + Pré-visualização Inline
+  // 1. Central de Documentos Digitais + Pré-visualização Inline
   const docsList = $("docs-central-list");
   const docsPreview = $("docs-central-preview");
   if (docsList && docsPreview) {
-    const recentes = [...state.exames]
+    const recentes = [...examesBase]
       .sort((a, b) => b.dataRealizacao.localeCompare(a.dataRealizacao))
       .slice(0, 3);
 
@@ -358,14 +433,14 @@ function renderAside(c) {
           const t = trabPorId(ex.trabalhadorId);
           const nomeArquivo =
             ex.arquivoNome ||
-            `${ex.tipo}_${(t?.nome || "Colaborador").replace(/\s+/g, "_")}.pdf`;
+            `${ex.tipo} · ${t?.nome || "Colaborador"} (PDF)`;
           const st = calcularStatusExame(ex.dataVencimento);
           return `
             <button type="button" class="doc-mini-item" data-docid="${esc(ex.id)}">
               <span class="doc-pdf-tag">PDF</span>
               <div class="doc-mini-info">
                 <strong>${esc(nomeArquivo)}</strong>
-                <span>${esc(t?.nome ?? "N/A")} · ${formatarDataBR(ex.dataRealizacao)}</span>
+                <span>${esc(t?.empresa ?? "Unidade")} · ${formatarDataBR(ex.dataRealizacao)}</span>
               </div>
               <span class="dot ${ST[st].c}" aria-hidden="true"></span>
             </button>`;
@@ -395,35 +470,57 @@ function renderAside(c) {
     }
   }
 
-  // 3. Próximos Vencimentos
-  const prox = state.exames
-    .filter((e) => calcularStatusExame(e.dataVencimento) !== "validos")
-    .sort((a, b) => a.dataVencimento.localeCompare(b.dataVencimento))
-    .slice(0, 5);
+  // 2. Pendências e Vencimentos (Abas: Vencidos | A vencer)
+  const vencidosList = examesBase
+    .filter((e) => calcularStatusExame(e.dataVencimento) === "vencidos")
+    .sort((a, b) => a.dataVencimento.localeCompare(b.dataVencimento));
+  const alertaList = examesBase
+    .filter((e) => calcularStatusExame(e.dataVencimento) === "alerta")
+    .sort((a, b) => a.dataVencimento.localeCompare(b.dataVencimento));
 
-  $("upcoming").innerHTML = prox.length
-    ? prox
+  const errCountEl = $("pend-tab-err-count");
+  const warnCountEl = $("pend-tab-warn-count");
+  if (errCountEl) errCountEl.textContent = vencidosList.length;
+  if (warnCountEl) warnCountEl.textContent = alertaList.length;
+
+  const listaAtiva =
+    state.pendTab === "vencidos" ? vencidosList.slice(0, 5) : alertaList.slice(0, 5);
+
+  $("upcoming").innerHTML = listaAtiva.length
+    ? listaAtiva
         .map((e) => {
           const t = trabPorId(e.trabalhadorId);
           const d = diasAte(e.dataVencimento);
           const st = calcularStatusExame(e.dataVencimento);
+          const prazoTxt =
+            d < 0 ? `${-d}d atrás` : d === 0 ? "hoje" : `em ${d}d`;
           return `
-            <button type="button" class="up-item" data-sel="${esc(e.trabalhadorId)}">
-              <span class="dot ${ST[st].c}" aria-hidden="true"></span>
-              <div style="min-width:0">
-                <div class="up-name">${esc(t?.nome ?? "N/A")}</div>
-                <div class="subtle">${esc(e.tipo)} · ${formatarDataBR(e.dataVencimento)}</div>
-              </div>
-              <span class="up-days c-${ST[st].c}">${d < 0 ? `${-d}d atrás` : d === 0 ? "hoje" : `em ${d}d`}</span>
-            </button>`;
+            <div class="up-row">
+              <button type="button" class="up-item" data-sel="${esc(e.trabalhadorId)}">
+                <span class="dot ${ST[st].c}" aria-hidden="true"></span>
+                <div style="min-width:0">
+                  <div class="up-name">${esc(t?.nome ?? "N/A")}</div>
+                  <div class="subtle">${esc(e.tipo)} · ${formatarDataBR(e.dataVencimento)} (${prazoTxt})</div>
+                </div>
+              </button>
+              ${
+                st === "vencidos"
+                  ? `<button type="button" class="btn-renew" data-renew-ex="${esc(e.id)}" title="Renovar exame em 1 clique">Renovar</button>`
+                  : `<span class="up-days c-${ST[st].c}">${prazoTxt}</span>`
+              }
+            </div>`;
         })
         .join("")
-    : `<p class="subtle" style="padding:8px 0">Todos os exames estão com a validade em dia!</p>`;
+    : `<p class="subtle" style="padding:10px 0">${
+        state.pendTab === "vencidos"
+          ? "Nenhum exame vencido no momento."
+          : "Nenhum exame vencendo nos próximos 30 dias."
+      }</p>`;
 
-  // 4. Distribuição por Tipo
+  // 3. Distribuição por Tipo
   const cnt = {};
-  state.exames.forEach((e) => (cnt[e.tipo] = (cnt[e.tipo] || 0) + 1));
-  const tot = state.exames.length || 1;
+  examesBase.forEach((e) => (cnt[e.tipo] = (cnt[e.tipo] || 0) + 1));
+  const tot = examesBase.length || 1;
   $("dist").innerHTML =
     Object.entries(cnt)
       .sort((a, b) => b[1] - a[1])
@@ -434,10 +531,31 @@ function renderAside(c) {
       .join("") || `<p class="subtle">Sem dados para exibição.</p>`;
 }
 
-/* ---------- TRABALHADORES ---------- */
+/* ---------- TRABALHADORES & GESTORES ---------- */
 export function renderTrabalhadores() {
-  const q = lerFiltros().q;
-  const lista = state.trabalhadores.filter((t) => trabCasaTermo(t, q));
+  const f = lerFiltros();
+  const lista = state.trabalhadores.filter(
+    (t) =>
+      (f.empresa === "todas" || t.empresa === f.empresa) &&
+      trabCasaTermo(t, f.q),
+  );
+  const listaGestores = state.gestores.filter((g) => {
+    if (f.empresa !== "todas" && g.empresa !== f.empresa) return false;
+    if (!f.q) return true;
+    const q = f.q;
+    return (
+      g.nome.toLowerCase().includes(q) ||
+      g.cargo.toLowerCase().includes(q) ||
+      g.empresa.toLowerCase().includes(q) ||
+      g.email.toLowerCase().includes(q)
+    );
+  });
+
+  const tabTrab = $("tab-count-trab");
+  const tabGest = $("tab-count-gest");
+  if (tabTrab) tabTrab.textContent = lista.length;
+  if (tabGest) tabGest.textContent = listaGestores.length;
+
   $("grid-trab").innerHTML = lista.length
     ? lista
         .map((t) => {
@@ -445,6 +563,7 @@ export function renderTrabalhadores() {
           const c = { validos: 0, alerta: 0, vencidos: 0 };
           ex.forEach((e) => c[calcularStatusExame(e.dataVencimento)]++);
           const pal = avatarColor(t.nome);
+          const gestor = gestorDaEmpresa(t.empresa);
           return `
             <article class="card w-card">
               <div class="w-card-head">
@@ -461,6 +580,7 @@ export function renderTrabalhadores() {
               <dl class="kv">
                 <dt>CPF</dt><dd>${esc(t.cpf)}</dd>
                 <dt>Empresa</dt><dd>${esc(t.empresa)}</dd>
+                <dt>Gestor</dt><dd>${esc(gestor?.nome ?? "Não vinculado")}</dd>
                 <dt>Exames</dt><dd>${ex.length}</dd>
               </dl>
               <div class="w-stats">${
@@ -481,6 +601,40 @@ export function renderTrabalhadores() {
         })
         .join("")
     : `<div class="card" style="grid-column:1/-1;padding:24px">${emptyState("Nenhum trabalhador encontrado", "Ajuste os termos da busca ou cadastre um novo colaborador.")}</div>`;
+
+  const gridGest = $("grid-gestores");
+  if (gridGest) {
+    gridGest.innerHTML = listaGestores.length
+      ? listaGestores
+          .map((g) => {
+            const pal = avatarColor(g.nome);
+            const vinculados = state.trabalhadores.filter(
+              (t) => t.empresa === g.empresa,
+            ).length;
+            return `
+              <article class="card w-card">
+                <div class="w-card-head">
+                  <span class="avatar lg" style="background:${pal.bg};color:${pal.color}">${esc(iniciais(g.nome))}</span>
+                  <div style="min-width:0;flex:1">
+                    <h3>${esc(g.nome)}</h3>
+                    <div class="subtle">${esc(g.cargo)}</div>
+                  </div>
+                  <div class="acts">
+                    <button type="button" class="icon-act" data-edit-gestor="${esc(g.id)}" aria-label="Editar gestor" title="Editar">${ICO_EDIT}</button>
+                    <button type="button" class="icon-act del" data-del-gestor="${esc(g.id)}" aria-label="Excluir gestor" title="Excluir">${ICO_DEL}</button>
+                  </div>
+                </div>
+                <dl class="kv">
+                  <dt>Empresa</dt><dd>${esc(g.empresa)}</dd>
+                  <dt>E-mail</dt><dd>${esc(g.email)}</dd>
+                  <dt>Telefone</dt><dd>${esc(g.telefone || "—")}</dd>
+                  <dt>Colaboradores</dt><dd>${vinculados} vinculado(s)</dd>
+                </dl>
+              </article>`;
+          })
+          .join("")
+      : `<div class="card" style="grid-column:1/-1;padding:24px">${emptyState("Nenhum gestor cadastrado", "Cadastre um gestor responsável por empresa ou unidade.")}</div>`;
+  }
 }
 
 /* ---------- EXAMES (TABELA -> CARDS NO MOBILE) ---------- */
@@ -489,6 +643,7 @@ export function renderExames() {
   const lista = aplicarFiltros(
     state.exames.filter((e) => {
       const t = trabPorId(e.trabalhadorId);
+      if (f.empresa !== "todas" && t?.empresa !== f.empresa) return false;
       return (t && trabCasaTermo(t, f.q)) || exameCasaTermo(e, f.q);
     }),
     f,
@@ -499,6 +654,7 @@ export function renderExames() {
         .map((e) => {
           const t = trabPorId(e.trabalhadorId);
           const pal = avatarColor(t?.nome ?? "");
+          const st = calcularStatusExame(e.dataVencimento);
           return `
             <tr>
               <td data-label="Trabalhador">
@@ -512,8 +668,8 @@ export function renderExames() {
               <td data-label="Vencimento" class="nowrap">${formatarDataBR(e.dataVencimento)}</td>
               <td data-label="Laboratório">${esc(e.laboratorio)}</td>
               <td data-label="Médico" class="muted">${esc(e.medico)}</td>
-              <td data-label="Situação">${badge(calcularStatusExame(e.dataVencimento))}</td>
-              <td class="td-actions" style="text-align:right"><div class="acts">${docBtn(e, "Abrir")}${acoesExame(e)}</div></td>
+              <td data-label="Situação">${badge(st)}</td>
+              <td class="td-actions" style="text-align:right"><div class="acts">${st === "vencidos" ? `<button type="button" class="btn-renew btn-renew-inline" data-renew-ex="${esc(e.id)}" title="Renovar exame em 1 clique">Renovar</button>` : ""}${docBtn(e, "Abrir")}${acoesExame(e)}</div></td>
             </tr>`;
         })
         .join("")
@@ -522,13 +678,14 @@ export function renderExames() {
 
 /* ---------- RELATÓRIOS (TABELA -> CARDS NO MOBILE) ---------- */
 export function renderRelatorios() {
-  const c = calcularContagens();
+  const empresa = lerFiltros().empresa;
+  const c = calcularContagens(empresa);
   animarContador($("r-conf"), c.conf, { sufixo: "%" });
   animarContador($("r-err"), c.vencidos);
   animarContador($("r-warn"), c.alerta);
 
   $("tb-pend").innerHTML =
-    linhasPendencia()
+    linhasPendencia(empresa)
       .map(({ t, info }) => {
         const pal = avatarColor(t.nome);
         return `
@@ -577,6 +734,18 @@ export function prepararExclusaoTrabalhador(id, pedirConfirmacao, onDone) {
         state.selecionadoId = state.trabalhadores[0]?.id ?? null;
       }
       onDone("Trabalhador excluído com sucesso.");
+    },
+  );
+}
+
+export function prepararExclusaoGestor(id, pedirConfirmacao, onDone) {
+  const g = gestorPorId(id);
+  if (!g) return;
+  pedirConfirmacao(
+    `Excluir o gestor ${g.nome} (${g.empresa})? Esta ação não pode ser desfeita.`,
+    () => {
+      state.gestores = state.gestores.filter((x) => x.id !== id);
+      onDone("Gestor excluído com sucesso.");
     },
   );
 }

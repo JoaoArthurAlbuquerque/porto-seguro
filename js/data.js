@@ -5,6 +5,7 @@
 
 export const STORAGE_KEY_TRABALHADORES = "saude_unificada_trabalhadores";
 export const STORAGE_KEY_EXAMES = "saude_unificada_exames";
+export const STORAGE_KEY_GESTORES = "saude_unificada_gestores";
 
 /* Armazenamento com fallback em memória (caso localStorage esteja bloqueado) */
 const storage = (() => {
@@ -94,6 +95,25 @@ function isoDiasRelativos(offsetDias) {
 
 const SAMPLE_DOC_URL =
   "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+
+export const INITIAL_GESTORES = [
+  {
+    id: "gest-1",
+    nome: "Carlos Eduardo Menezes",
+    cargo: "Gerente de SST & Operações",
+    email: "carlos.menezes@masterboi.com.br",
+    telefone: "(81) 99412-3301",
+    empresa: "Masterboi Indústria S.A.",
+  },
+  {
+    id: "gest-2",
+    nome: "Fernanda Beatriz Lins",
+    cargo: "Coordenadora de Gente & Gestão",
+    email: "fernanda.lins@portodigital.org",
+    telefone: "(81) 99824-1180",
+    empresa: "Porto Digital Recife",
+  },
+];
 
 export const INITIAL_TRABALHADORES = [
   {
@@ -250,15 +270,21 @@ export const obterTrabalhadores = () =>
 export const obterExames = () =>
   carregar(STORAGE_KEY_EXAMES, criarExamesIniciais);
 
+export const obterGestores = () =>
+  carregar(STORAGE_KEY_GESTORES, () => structuredClone(INITIAL_GESTORES));
+
 export const salvarTrabalhadores = (t) => salvar(STORAGE_KEY_TRABALHADORES, t);
 export const salvarExames = (e) => salvar(STORAGE_KEY_EXAMES, e);
+export const salvarGestores = (g) => salvar(STORAGE_KEY_GESTORES, g);
 
 export function resetarDadosDemo() {
   const trabs = structuredClone(INITIAL_TRABALHADORES);
   const exs = criarExamesIniciais();
+  const gests = structuredClone(INITIAL_GESTORES);
   salvarTrabalhadores(trabs);
   salvarExames(exs);
-  return { trabalhadores: trabs, exames: exs };
+  salvarGestores(gests);
+  return { trabalhadores: trabs, exames: exs, gestores: gests };
 }
 
 /* Utilitários de CPF */

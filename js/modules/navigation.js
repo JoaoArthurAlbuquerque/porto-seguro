@@ -10,6 +10,9 @@ import {
   emIframe,
   esc,
   trabPorId,
+  gestorPorId,
+  empresasDisponiveis,
+  lerFiltros,
   linhasPendencia,
 } from "./state.js";
 import { toast } from "./animations.js";
@@ -64,19 +67,23 @@ export function irPara(v, renderFn) {
 }
 
 /* ---------- Modo de Anexo no Modal de Exame ---------- */
-export function setDocModo(m) {
+export function setDocModo(m, preservarArquivo = false) {
   state.docModo = m;
-  state.arquivoBlob = null;
-  state.arquivoNome = "";
-  const fileInput = $("e-file");
-  if (fileInput) fileInput.value = "";
+  if (!preservarArquivo) {
+    state.arquivoBlob = null;
+    state.arquivoNome = "";
+    const fileInput = $("e-file");
+    if (fileInput) fileInput.value = "";
+  }
   $("e-link")?.removeAttribute("aria-invalid");
 
   const atual =
     state.editExId && state.exames.find((x) => x.id === state.editExId);
   const fileNameTag = $("file-name");
   if (fileNameTag) {
-    if (m === "file" && (atual?.arquivoId || atual?.arquivo)) {
+    if (preservarArquivo && state.arquivoNome) {
+      fileNameTag.textContent = `📎 ${state.arquivoNome}`;
+    } else if (m === "file" && (atual?.arquivoId || atual?.arquivo)) {
       fileNameTag.textContent = `📎 ${atual.arquivoNome || "arquivo atual"} (mantido se não for trocado)`;
     } else {
       fileNameTag.textContent = "";
@@ -94,9 +101,18 @@ export function setDocModo(m) {
   $("doc-err")?.classList.add("hidden");
 }
 
+function syncEmpresasDatalist() {
+  const dl = $("empresas-datalist");
+  if (!dl) return;
+  dl.innerHTML = empresasDisponiveis()
+    .map((emp) => `<option value="${esc(emp)}"></option>`)
+    .join("");
+}
+
 /* ---------- Modais ---------- */
 export function abrirModal(id, trabId) {
   state.ultimoFoco = document.activeElement;
+  syncEmpresasDatalist();
 
   if (id === "modal-trabalhador") {
     const t = state.editTrabId && trabPorId(state.editTrabId);
@@ -108,6 +124,20 @@ export function abrirModal(id, trabId) {
       $("t-cpf").value = t.cpf;
       $("t-setor").value = t.setor;
       $("t-emp").value = t.empresa;
+    }
+  }
+
+  if (id === "modal-gestor") {
+    const g = state.editGestorId && gestorPorId(state.editGestorId);
+    $("mg-title").textContent = g ? "Editar Gestor" : "Novo Gestor";
+    $("mg-submit").textContent = g ? "Salvar Alterações" : "Salvar Gestor";
+    $("btn-demo-gestor")?.classList.toggle("hidden", Boolean(g));
+    if (g) {
+      $("g-nome").value = g.nome;
+      $("g-cargo").value = g.cargo;
+      $("g-emp").value = g.empresa;
+      $("g-email").value = g.email;
+      $("g-tel").value = g.telefone || "";
     }
   }
 
@@ -130,9 +160,22 @@ export function abrirModal(id, trabId) {
 
     const ex =
       state.editExId && state.exames.find((e) => e.id === state.editExId);
-    $("me-title").textContent = ex ? "Editar Exame" : "Registrar Exame ou ASO";
-    $("me-submit").textContent = ex ? "Salvar Alterações" : "Registrar Exame";
-    $("btn-demo-exame")?.classList.toggle("hidden", Boolean(ex));
+    const renewEx =
+      !ex &&
+      state.renewExId &&
+      state.exames.find((e) => e.id === state.renewExId);
+
+    $("me-title").textContent = ex
+      ? "Editar Exame"
+      : renewEx
+        ? "Renovar Exame / ASO"
+        : "Registrar Exame ou ASO";
+    $("me-submit").textContent = ex
+      ? "Salvar Alterações"
+      : renewEx
+        ? "Registrar Renovação"
+        : "Registrar Exame";
+    $("btn-demo-exame")?.classList.toggle("hidden", Boolean(ex || renewEx));
 
     if (ex) {
       $("e-trab").value = ex.trabalhadorId;
@@ -146,6 +189,25 @@ export function abrirModal(id, trabId) {
       } else {
         setDocModo("link");
         $("e-link").value = ex.linkDocumento || "";
+      }
+    } else if (renewEx) {
+      const hoje = new Date();
+      const venc = new Date(
+        hoje.getFullYear() + 1,
+        hoje.getMonth(),
+        hoje.getDate(),
+      );
+      const toISO = (d) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+      $("e-trab").value = renewEx.trabalhadorId;
+      $("e-tipo").value = renewEx.tipo;
+      $("e-lab").value = renewEx.laboratorio;
+      $("e-med").value = renewEx.medico;
+      $("e-real").value = toISO(hoje);
+      $("e-venc").value = toISO(venc);
+      if (!state.arquivoBlob) {
+        setDocModo("link");
       }
     }
   }
@@ -175,6 +237,8 @@ export function fecharModal(m) {
   if (m.id !== "modal-confirm") {
     state.editTrabId = null;
     state.editExId = null;
+    state.editGestorId = null;
+    state.renewExId = null;
   }
   if (m.id === "modal-exame") setDocModo("link");
   if (m.id === "modal-doc") {
@@ -245,9 +309,10 @@ export async function abrirDocumento(id) {
 /* ---------- Exportação CSV e Impressão ---------- */
 export function exportarCSV() {
   const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
+  const empresa = lerFiltros().empresa;
   const rows = [
     ["Trabalhador", "CPF", "Setor", "Empresa", "Situação", "Ação recomendada"],
-    ...linhasPendencia().map(({ t, info }) => [
+    ...linhasPendencia(empresa).map(({ t, info }) => [
       t.nome,
       t.cpf,
       t.setor,
