@@ -55,14 +55,12 @@ export function syncFiltroUI() {
     summary.textContent = temFiltro ? "Filtros ativos" : "";
   }
 
-  document
-    .querySelectorAll(".kpi")
-    .forEach((k) =>
-      k.classList.toggle(
-        "selected",
-        k.dataset.kpi !== "todos" && k.dataset.kpi === f.status,
-      ),
-    );
+  document.querySelectorAll(".kpi").forEach((k) => {
+    const selecionado =
+      k.dataset.kpi !== "todos" && k.dataset.kpi === f.status;
+    k.classList.toggle("selected", selecionado);
+    k.setAttribute("aria-pressed", String(selecionado));
+  });
   $("filters")?.classList.toggle(
     "hidden",
     !["dashboard", "exames"].includes(state.vista),
@@ -118,7 +116,7 @@ function renderCronograma(c) {
             : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
       return `
-        <button type="button" class="cronograma-step ${cls}" data-sel="${esc(ex.trabalhadorId)}" role="listitem">
+        <button type="button" class="cronograma-step ${cls}" data-sel="${esc(ex.trabalhadorId)}">
           <span class="cronograma-node ${cls}" aria-hidden="true">${icon}</span>
           <div class="cronograma-info">
             <strong>${esc(ex.tipo)} · ${esc(t?.nome.split(" ")[0] ?? "Colaborador")}</strong>
@@ -313,10 +311,16 @@ function renderGrafico() {
     if (c) c.n++;
   });
   const max = Math.max(1, ...cols.map((c) => c.n));
-  $("chart").innerHTML = cols
+  const total12m = cols.reduce((acc, c) => acc + c.n, 0);
+  const chartEl = $("chart");
+  chartEl?.setAttribute(
+    "aria-label",
+    `Gráfico de exames realizados nos últimos 12 meses: ${total12m} exame(s) no período`,
+  );
+  chartEl.innerHTML = cols
     .map(
       (c, i) => `
-        <div class="bar-col ${c.n > 0 ? "has-data" : ""}" title="${MESES[c.m]}/${c.y}: ${c.n} exame(s)">
+        <div class="bar-col ${c.n > 0 ? "has-data" : ""}" title="${MESES[c.m]}/${c.y}: ${c.n} exame(s)" aria-hidden="true">
           <span class="bar-val">${c.n}</span>
           <div class="bar-track">
             <div class="bar ${i === 11 ? "current" : ""}" style="height:${Math.max(8, (c.n / max) * 100)}%"></div>

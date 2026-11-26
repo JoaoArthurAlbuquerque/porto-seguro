@@ -51,9 +51,32 @@ svg {
 }
 
 :focus-visible {
-  outline: none;
+  outline: 2px solid transparent;
   box-shadow: var(--focus-ring);
   border-radius: var(--radius-sm);
+}
+
+/* Link de salto para acessibilidade por teclado */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: var(--sp-4);
+  z-index: 3000;
+  background: var(--brand);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  box-shadow: var(--shadow-modal);
+  transition: top var(--t-fast) var(--ease-out);
+}
+
+.skip-link:focus {
+  top: var(--sp-3);
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 
 /* Estados e Acessibilidade */

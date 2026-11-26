@@ -168,11 +168,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }),
   );
 
-  // Atalhos de teclado (Escape e / para busca)
+  // Atalhos de teclado (Escape, Tab trap em modais e / para busca)
   document.addEventListener("keydown", (e) => {
+    const modalAtivo = document.querySelector(".modal:not(.hidden)");
+    if (e.key === "Tab" && modalAtivo) {
+      const focaveis = [
+        ...modalAtivo.querySelectorAll(
+          'button:not([disabled]):not(.hidden), [href], input:not([disabled]):not([type="hidden"]):not(.sr-only), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ].filter((el) => el.offsetParent !== null);
+      if (focaveis.length) {
+        const primeiro = focaveis[0];
+        const ultimo = focaveis[focaveis.length - 1];
+        if (e.shiftKey && document.activeElement === primeiro) {
+          e.preventDefault();
+          ultimo.focus();
+        } else if (!e.shiftKey && document.activeElement === ultimo) {
+          e.preventDefault();
+          primeiro.focus();
+        }
+      }
+      return;
+    }
+
     if (e.key === "Escape") {
-      const m = document.querySelector(".modal:not(.hidden)");
-      if (m) fecharModal(m);
+      if (modalAtivo) fecharModal(modalAtivo);
       else fecharMenu();
     }
     if (

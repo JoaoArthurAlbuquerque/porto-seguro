@@ -462,7 +462,8 @@
 .bar-track {
   width: 100%;
   max-width: 28px;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: flex-end;
   background: #f1f5f9;
@@ -868,7 +869,7 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .conf-card-counter {
@@ -887,7 +888,7 @@
 .conf-title {
   font-size: 13.5px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.92);
+  color: #ffffff;
 }
 
 .conf-num {
@@ -902,7 +903,7 @@
 
 .conf-sub {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(255, 255, 255, 0.94);
   line-height: 1.4;
 }
 
@@ -1331,13 +1332,15 @@
   min-width: 0;
 }
 
-.field label {
+.field label,
+.field .field-label {
   font-size: 12.5px;
   font-weight: 700;
   color: var(--ink-secondary);
 }
 
-.field label .req {
+.field label .req,
+.field .field-label .req {
   color: var(--err);
 }
 
@@ -1562,8 +1565,8 @@ img.viewer {
   }
 
   .worker-banner .acts .icon-act {
-    width: 42px;
-    height: 42px;
+    width: var(--tap-min);
+    height: var(--tap-min);
   }
 
   .exam {
@@ -1604,12 +1607,12 @@ img.viewer {
 
   .exam .acts .btn {
     flex: 1;
-    height: 40px;
+    height: var(--tap-min);
   }
 
   .exam .acts .icon-act {
-    width: 40px;
-    height: 40px;
+    width: var(--tap-min);
+    height: var(--tap-min);
   }
 
   /* Sparkline compacta no mobile */
@@ -1694,6 +1697,10 @@ img.viewer {
 
   .viewer {
     height: 54dvh;
+  }
+
+  img.viewer {
+    max-height: 54dvh;
   }
 
   .toast {
@@ -1819,12 +1826,12 @@ img.viewer {
 
   .table-responsive tbody tr:not(.empty-row) td.td-actions .acts .btn {
     flex: 1;
-    height: 40px;
+    height: var(--tap-min);
   }
 
   .table-responsive tbody tr:not(.empty-row) td.td-actions .acts .icon-act {
-    width: 40px;
-    height: 40px;
+    width: var(--tap-min);
+    height: var(--tap-min);
   }
 
   .table-responsive tr.empty-row,
@@ -2011,7 +2018,7 @@ img.viewer {
 
 .alert-banner-desc {
   font-size: 12px;
-  color: #b45309;
+  color: #92400e;
   line-height: 1.4;
   margin-top: 2px;
 }
@@ -2176,7 +2183,7 @@ img.viewer {
 .doc-preview-link {
   background: none;
   border: none;
-  padding: 0;
+  padding: 6px 0;
   margin-top: 2px;
   font-size: 11.5px;
   font-weight: 700;

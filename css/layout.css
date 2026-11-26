@@ -527,8 +527,16 @@
     display: flex;
   }
 
-  .topbar-actions .lbl {
-    display: none;
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 45;
+    background: rgba(241, 245, 249, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    margin: calc(var(--page-py) * -1) calc(var(--page-px) * -1) 0;
+    padding: 12px var(--page-px);
+    border-bottom: 1px solid rgba(219, 227, 238, 0.75);
   }
 
   .split {
@@ -809,5 +817,16 @@
 
   .bottom-nav-label {
     font-size: 9.5px;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar-actions .btn .lbl {
+    display: none;
+  }
+
+  .topbar-actions .btn[data-open="modal-trabalhador"] {
+    width: var(--tap-min);
+    padding: 0;
   }
 }

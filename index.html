@@ -15,6 +15,7 @@
 </head>
 
 <body>
+  <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
 
   <div class="app-layout">
     <!-- SIDEBAR -->
@@ -110,10 +111,10 @@
     <div id="overlay" class="overlay" aria-hidden="true"></div>
 
     <!-- MAIN CONTENT AREA -->
-    <main class="main">
+    <main id="main-content" class="main" tabindex="-1">
       <!-- TOPBAR -->
       <header class="topbar">
-        <button id="menu-btn" type="button" class="icon-btn mobile-menu-btn" aria-label="Abrir menu">
+        <button id="menu-btn" type="button" class="icon-btn mobile-menu-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -137,7 +138,7 @@
         </label>
 
         <div class="topbar-actions">
-          <button type="button" class="btn btn-ghost" data-open="modal-trabalhador" title="Cadastrar Trabalhador">
+          <button type="button" class="btn btn-ghost" data-open="modal-trabalhador" title="Cadastrar Trabalhador" aria-label="Cadastrar Trabalhador">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
@@ -207,6 +208,7 @@
 
       <!-- ================= VIEW: DASHBOARD ================= -->
       <section id="view-dashboard" class="view">
+        <h1 class="sr-only">Dashboard · Gestão Ocupacional</h1>
         <div class="dash">
           <!-- Main Central Column -->
           <div class="dash-main">
@@ -223,7 +225,7 @@
                   <span id="cronograma-pct" class="sched-pct">0% concluído</span>
                 </div>
               </div>
-              <div id="cronograma-track" class="cronograma-track" role="list" aria-label="Marcos de exames ocupacionais"></div>
+              <div id="cronograma-track" class="cronograma-track" aria-label="Marcos de exames ocupacionais"></div>
             </div>
 
             <!-- Top Hero Card + Gráfico de Evolução -->
@@ -692,15 +694,15 @@
           <span class="error hidden" data-err-for="e-med">Informe o médico responsável e registro.</span>
         </div>
         <div class="field">
-          <label>Documento digital <span class="req">*</span></label>
-          <div class="seg" role="tablist">
-            <button type="button" class="on" data-doc="link" role="tab" aria-selected="true">Colar link</button>
-            <button type="button" class="doc-tab" data-doc="file" role="tab" aria-selected="false">Selecionar arquivo</button>
+          <span id="doc-label" class="field-label">Documento digital <span class="req">*</span></span>
+          <div class="seg" role="tablist" aria-labelledby="doc-label">
+            <button id="tab-doc-link" type="button" class="on" data-doc="link" role="tab" aria-selected="true" aria-controls="doc-link">Colar link</button>
+            <button id="tab-doc-file" type="button" class="doc-tab" data-doc="file" role="tab" aria-selected="false" aria-controls="doc-file">Selecionar arquivo</button>
           </div>
-          <div id="doc-link">
-            <input id="e-link" type="url" class="input" placeholder="https://drive.google.com/file/d/...">
+          <div id="doc-link" role="tabpanel" aria-labelledby="tab-doc-link">
+            <input id="e-link" type="url" class="input" aria-label="Link do documento digital" placeholder="https://drive.google.com/file/d/...">
           </div>
-          <div id="doc-file" class="hidden">
+          <div id="doc-file" class="hidden" role="tabpanel" aria-labelledby="tab-doc-file">
             <label id="drop" class="drop" for="e-file">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="drop-icon" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />

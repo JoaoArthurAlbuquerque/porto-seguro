@@ -27,13 +27,18 @@ export function syncBodyLock() {
 export function abrirMenu() {
   $("sidebar")?.classList.add("open");
   $("overlay")?.classList.add("on");
+  $("menu-btn")?.setAttribute("aria-expanded", "true");
   syncBodyLock();
+  setTimeout(() => $("sidebar-close-btn")?.focus(), 40);
 }
 
 export function fecharMenu() {
+  const estavaAberto = $("sidebar")?.classList.contains("open");
   $("sidebar")?.classList.remove("open");
   $("overlay")?.classList.remove("on");
+  $("menu-btn")?.setAttribute("aria-expanded", "false");
   syncBodyLock();
+  if (estavaAberto) $("menu-btn")?.focus();
 }
 
 /* ---------- Troca de Views ---------- */
@@ -228,8 +233,13 @@ export async function abrirDocumento(id) {
   if (ex.arquivoId || ex.arquivo) {
     return toast("Arquivo não encontrado neste navegador.", "warn");
   }
-  if (ex.linkDocumento) window.open(ex.linkDocumento, "_blank", "noopener");
-  else toast("Documento não disponível.", "warn");
+  if (ex.linkDocumento && /^https?:\/\//i.test(ex.linkDocumento)) {
+    window.open(ex.linkDocumento, "_blank", "noopener");
+  } else if (ex.linkDocumento) {
+    toast("Link de documento inválido.", "warn");
+  } else {
+    toast("Documento não disponível.", "warn");
+  }
 }
 
 /* ---------- Exportação CSV e Impressão ---------- */
